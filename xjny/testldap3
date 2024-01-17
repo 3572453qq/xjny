@@ -1,0 +1,113 @@
+#coding=utf-8
+from ldap3 import *
+import sys
+import pymysql
+import time
+
+def user_info(c, user, base):
+    filterstr = f"(sAMAccountName={user})"
+    print("\033[0;31;43m"+filterstr+"\033[0m")
+    print(base)
+    id = c.search(base, filterstr,search_scope=SUBTREE,attributes = ALL_ATTRIBUTES )
+    result_data = c.result
+    try:
+        dn_name = c.response[0]['dn']
+    except:
+        return 'not found'
+    return dn_name
+
+
+def modify_password(c,user,password,base):
+    dn_name=user_info(c,user,base)
+    print('here is dn name:',dn_name)
+    if dn_name=='not found':
+        return 0,f'sAMAccountName:{user} not found in ad'
+    c.extend.microsoft.modify_password(dn_name, password)
+    reset_result_data = c.result
+    print('Reset password:',reset_result_data)
+    mod_attrs = {"lockoutTime":[(MODIFY_REPLACE,'0')]}
+    c.modify(dn_name,mod_attrs)
+    result_data = c.result
+    print('Unlock user:',result_data)
+    if reset_result_data['result'] == 0:
+        return 1,str(reset_result_data['result'])+' and '+reset_result_data['description']
+    else:
+        return 0,str(reset_result_data['result'])+' and '+reset_result_data['description']
+
+def unlock_user(c,user,base):
+    dn_name=user_info(c,user,base)
+    print('here is dn name:',dn_name)
+    if dn_name=='not found':
+        return 0,f'sAMAccountName:{user} not found in ad'
+    mod_attrs = {"lockoutTime":[(MODIFY_REPLACE,'0')]}
+    c.modify(dn_name,mod_attrs)
+    result_data = c.result
+    print('Unlock user:',result_data)
+    if result_data['result'] == 0:
+        return 1,str(result_data['result'])+' and '+result_data['description']
+    else:
+        return 0,str(result_data['result'])+' and '+result_data['description']
+
+
+
+if __name__ == '__main__':
+
+    #连接ad服务器
+    admin = "userset"
+    adminpwd = "Genzon#234"
+    server_ip = '192.168.1.70'
+    print('server ip is:',server_ip)
+    s = Server(server_ip, get_info=ALL, use_ssl=True)
+    c = Connection(s, user=admin, password=adminpwd, auto_bind=True)
+    base='OU=Genzon,DC=genzon,DC=com,DC=cn'
+    print('connecting ad server',c.result)
+
+    #查询接口表
+    db_host = 'rm-wz976x772b4z7dz17.mysql.rds.aliyuncs.com'
+    db_user = 'upasswd'
+    db_pass = 'U123passwd456'
+    db_name = 'iam5'
+    # db_name = 'iamuppasswd'
+
+    db = pymysql.connect(host=db_host,user=db_user,password=db_pass,database=db_name)
+    cursor = db.cursor(cursor=pymysql.cursors.DictCursor)
+
+    #循环修改密码
+    count = cursor.execute("select * from AD_OPERATE where operate_status=0 and operate_type=1")
+    print('modify password count:',count)
+    for i,data in enumerate(cursor.fetchall()):
+        print('#'*30,i,'#'*30)
+        time.sleep(0.1)
+        success,failed_cause=modify_password(c,
+            data['sAMAccountName'].zfill(6) if data['sAMAccountName'].isdigit() else data['sAMAccountName'],
+            data['new_password'],
+            base)
+        # print(failed_cause)
+        # sql_str=f"update AD_OPERATE set operate_status=2,update_time=now(),failed_cause='{failed_cause}' where serial_number={data['serial_number']}"
+        # print(sql_str)
+        if success:
+            cursor.execute(f"update AD_OPERATE set operate_status=1,update_time=now() where serial_number={data['serial_number']}")
+        else:
+            cursor.execute(f"update AD_OPERATE set operate_status=2,update_time=now(),failed_cause='{failed_cause}' where serial_number={data['serial_number']}")
+    db.commit()
+
+    #循环解锁
+    count = cursor.execute("select * from AD_OPERATE where operate_status=0 and operate_type=2")
+    print('unlock count:',count)
+    for i,data in enumerate(cursor.fetchall()):
+        print('#'*30,i,'#'*30)
+        time.sleep(0.1)
+        success,failed_cause=unlock_user(c,
+            data['sAMAccountName'].zfill(6) if data['sAMAccountName'].isdigit() else data['sAMAccountName'],
+            base)
+        # print(failed_cause)
+        # sql_str=f"update AD_OPERATE set operate_status=2,update_time=now(),failed_cause='{failed_cause}' where serial_number={data['serial_number']}"
+        # print(sql_str)
+        if success:
+            cursor.execute(f"update AD_OPERATE set operate_status=1, update_time=now() where serial_number={data['serial_number']}")
+        else:
+            cursor.execute(f"update AD_OPERATE set operate_status=2,update_time=now(),failed_cause='{failed_cause}' where serial_number={data['serial_number']}")
+    db.commit()
+
+    db.close()
+    c.unbind()

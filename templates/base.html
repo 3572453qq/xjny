@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+{% load static %}
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="author" content="order by dede58.com"/>
+    <title>inx {% block title %}{% endblock %}</title>
+
+    <!-- start: CSS -->
+    <link href="{% static 'assets/css/bootstrap.css' %}" rel="stylesheet" />
+    <link href="{% static 'assets/css/base.css' %}" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'kendoandbootstrap/kendouipro/styles/kendo.common.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'kendoandbootstrap/kendouipro/styles/kendo.default.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'kendoandbootstrap/kendouipro/styles/kendo.blueopal.min.css' %}" />
+    <!-- <link href="/static/css/font-awesome.min.css" rel="stylesheet"> -->
+    <!-- <link rel="shortcut icon" href="/static/images/gz-titleLogo.png" /> -->
+    <!-- end: CSS -->
+
+    <!-- start: JS -->
+    <script src="{% static 'kendoandbootstrap/kendouipro/js/jquery.min.js' %}"></script>
+    <script src="{% static 'kendoandbootstrap/kendouipro/js/jszip.min.js' %}"></script>
+    <script src="{% static 'kendoandbootstrap/bootstrap-4.2.1-dist/js/bootstrap.js' %}"></script>
+    <script src="{% static 'kendoandbootstrap/kendouipro/js/kendo.grid.min.js' %}"></script>
+    <script src="{% static 'kendoandbootstrap/kendouipro/js/kendo.all.min.js' %}"></script>
+    <script src="{% static 'kendoandbootstrap/kendouipro/js/cultures/kendo.culture.zh-CN.min.js' %}"></script>
+    <script src="{% static 'kendoandbootstrap/kendouipro/js/messages/kendo.messages.zh-CN.min.js' %}"></script>
+    
+    <!-- end: JS -->
+</head>
+
+
+
+<body style="min-height:800px; height: auto">
+    <div class="container-fluid">
+
+        <nav class="navbar navbar-default row no-yj  navbar-fixed-top">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#nav-list-left" aria-expanded="false">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                    <a class="navbar-brand" href="#">欣界能源lims</a>
+                </div>
+
+                <div class="collapse navbar-collapse pull-right" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li><a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="glyphicon glyphicon-bell"><i class="label label-warning label-nav">66</i></i></a>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li><a href="#">哈哈哈</a></li>
+                            </ul>
+                        </li>
+                        <li><a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="glyphicon glyphicon-envelope"><i class="label label-success label-nav">6</i></i></a>
+
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li><a href="#">哈哈哈</a></li>
+                            </ul>
+                        </li>
+                        <li><a class="dropdown-toggle" data-toggle="dropdown" href="#" style="height: 50px">
+                            <img class="img-circle pull-left img-responsive nav-user-img" src="{% static 'assets/img/xjny.png' %}" /><span class="pull-left nav-username">管理员</span></a>
+
+                            <ul class="dropdown-menu dropdown-menu-right clearfix" style="padding-top: 0px">
+                                <li class="user-li-head"><span>
+                                    <img class="img-circle nav-user-img-xiala center-block" src="{% static 'assets/img/xjny.png' %}" /></span>
+                                    <p></p>
+                                    <p class="text-center"><span>网络部 - 网络工程师</span></p>
+                                    <p class="text-center"><span>远一博</span> </p>
+                                    <p class="text-center"><small><span>2015-04-23加入</span></small></p>
+                                </li>
+                                <li style="padding: 10px 20px; padding-bottom: 20px">
+
+                                    <div class="pull-left">
+                                        <a href="#" class="btn btn-default btn-flat no-yj">资料</a>
+                                    </div>
+                                    <div class="pull-right">
+                                        <a href="#" class="btn btn-default btn-flat no-yj">注销</a>
+                                    </div>
+                                </li>
+                                </ul>
+                        </li>
+                    </ul>
+
+
+                </div>
+
+
+
+            </div>
+        </nav>
+        
+    
+        <div class="row" style="margin-top:70px">
+            <div class="  nav-left col-md-2 no-padding" id="nav-list-left">
+                <div class="user-panel">
+                    <img src="{% static 'assets/img/xjny.png' %}" class="img-circle center-block" />
+                </div>
+
+                <div class="nav-list" >
+                    <ul>
+                        <li>
+                            <a href="#">首页</a>
+
+                        </li>
+                        <li>
+                            <a href="#">测试菜单一</a>
+                        </li>
+                        <li>
+                            <a href="#">测试菜单二</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="main-right  col-md-10 col-md-offset-2">
+                {% block body_block %}{% endblock %}                
+            </div>
+        </div>
+
+
+    </div>
+    <!-- <script src="http://cdn.bootcss.com/jquery/1.11.2/jquery.min.js"></script>
+    <script src="http://cdn.bootcss.com/bootstrap/3.3.4/js/bootstrap.min.js"></script> -->
+    <script>
+        $(document).ready(function () {
+            $(".dropdownMenu").dropdown();
+            $(".nav-left-dropdown>a").click(function () {
+
+
+                if ($(this).attr("d") != 1 && $(this).attr("d") != undefined) {
+                    $(this).removeClass("nav-left-dropdown-a");
+                    $this = $(this);
+                    $(this).next("ul").slideUp(300, function () { $this.removeClass("nav-left-bottrom-border"); $this.removeClass("nav-left-dropdown-ul") });
+
+                    $(this).attr("d", "1");
+
+                } else {
+                    $(this).addClass("nav-left-dropdown-a");
+                    $(this).addClass("nav-left-bottrom-border");
+                    $(this).next("ul").addClass("nav-left-dropdown-ul").slideDown(300);
+                    $(this).attr("d", "2");
+
+                }
+
+
+            })
+        });
+
+    </script>
+<style>
+.copyrights{text-indent:-9999px;height:0;line-height:0;font-size:0;overflow:hidden;}
+</style>
+<div class="copyrights" id="links20210126">
+	Collect from <a href="http://www.cssmoban.com/"  title="网站模板">模板之家</a>
+	<a href="http://cooco.net.cn/" title="组卷网">组卷网</a>
+</div>
+</body>
+</html>
+

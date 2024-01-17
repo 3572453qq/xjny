@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}导出测试结果报表{% endblock %}
+{% block body_block %}
+
+<form method="post" style="width:500px">
+    <input name="files" id="fileUpload" type="file" />
+</form>
+<div id="gridContainer"></div>
+
+
+<script>
+    $('#fileUpload').kendoUpload(
+            {
+                multiple: true,
+                async: {
+                    'saveUrl': '/lims/handlevkeep',
+                    'autoUpload': false
+                },
+                localization: {
+                    select: "上传文件进行处理",
+                    uploadSelectedFiles: "确定上传"
+                },
+                validation: {
+                    allowedExtensions: ['CSV', 'XLS', 'XLSX'],
+                },
+                success: function (e) {
+                    // 在上传成功后，获取后台返回的数据
+                    var responseData = e.response.data;
+
+                    // 处理每个文件的数据
+                    responseData.forEach(function(fileData) {
+                        var gridId = 'grid_' + Math.floor(Math.random() * 1000);
+                        // 创建一个新的 <div> 用于放置 Grid
+                        $("#gridContainer").append('<div id="' + gridId + '"></div>');
+                        // 获取列定义
+                        var columns = [];
+                        fileData.columns.forEach(function(column) {
+                            columns.push({ field: column, title: column, width: 120 });
+                        });
+                        
+
+                        // 创建 Kendo UI Grid
+                        generateGrid(gridId,fileData,columns)
+                        
+                    });   
+                },
+                complete: function (e) {
+                  console.log('complete event.');
+                  console.log(e)
+                
+                                    
+                },
+            }
+      ); 
+      function generateGrid(gridId,fileData,columns)
+      {
+        // console.log(fileData.data)
+
+        $("#" + gridId).kendoGrid({
+            dataSource: {
+                data: JSON.parse(fileData.data),
+            },
+            height: 550,
+            sortable: true,
+            pageable: true,
+            columns: columns,
+            resizable: true,
+        });
+
+
+        
+      }
+
+
+
+
+
+
+</script>
+
+{% endblock %}

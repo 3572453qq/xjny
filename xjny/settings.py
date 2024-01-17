@@ -11,6 +11,23 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from .local_settings import *
+import ldap
+import os
+from django_auth_ldap.config import LDAPSearch
+# settings.py
+
+import ldap3
+
+AUTH_LDAP_SERVER_URI = 'ldap://172.28.1.254'  # 替换为你的AD服务器地址
+AUTH_LDAP_BIND_DN = 'CN=administrator,OU=Users,DC=xworld,DC=com'  # 替换为你的绑定DN
+AUTH_LDAP_BIND_PASSWORD = 'xinshijie@2023'  # 替换为你的绑定密码
+AUTH_LDAP_USER_SEARCH = ldap3.ALL  # 使用默认的用户搜索设置
+
+AUTHENTICATION_BACKENDS = [
+    # 'django_auth_ldap.backend.LDAPBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +42,7 @@ SECRET_KEY = 'django-insecure-1r_5d$w@31q4i5wuz*qfbpa+oc%2xd=*%%0wd+5sgltxc9&vl2
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -37,13 +54,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'registration',
+    'lims',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -54,7 +73,7 @@ ROOT_URLCONF = 'xjny.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR/'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -75,8 +94,12 @@ WSGI_APPLICATION = 'xjny.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'xjny',
+        'USER': DATABASE_USER,
+        'PASSWORD': DATABASE_PASSWORD,
+        'HOST': DATABASE_HOST,
+        'PORT': DATABASE_PORT,
     }
 }
 
@@ -116,8 +139,33 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+MEDIA_URL = 'images/'
+
+STATIC_DIRS = [ BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+MEDIA_ROOT =  BASE_DIR / 'images'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'file': {
+#             'level': 'DEBUG',
+#             'class': 'logging.FileHandler',
+#             'filename': '/var/log/djangologfile.log',  # 替换为你想要保存日志的路径
+#         },
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['file'],
+#             'level': 'DEBUG',
+#             'propagate': True,
+#         },
+#     },
+# }
