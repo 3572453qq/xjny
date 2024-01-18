@@ -20,7 +20,7 @@ def handlevkeep(request):
         for filename in request.FILES.getlist('files'):
             print(filename)
             # 使用 pandas 读取 Excel 文件
-            df = pd.read_excel(filename)
+            df = pd.read_excel(filename,sheet_name='cycle')
             
             # 获取列头信息
             columns = list(df.columns)
@@ -34,9 +34,12 @@ def handlevkeep(request):
             print(json_data)
             json_data = json.dumps(json_data)
 
+            barcode = re.sub(r'\.[^.]*$','', filename.name)
+    
             # 将数据和文件名添加到响应数据中
             response_data.append({
                 'filename': filename.name,
+                'barcode': barcode,
                 'data': json_data,
                 'columns': columns
             })

@@ -6,6 +6,7 @@
     <input name="files" id="fileUpload" type="file" />
 </form>
 <div id="gridContainer"></div>
+<div id="spreadsheet"></div>
 
 
 <script>
@@ -40,9 +41,12 @@
                         
 
                         // 创建 Kendo UI Grid
-                        generateGrid(gridId,fileData,columns)
+                        generateGrid(gridId,fileData,columns)                        
+
                         
-                    });   
+                    });
+                    generateSpreadsheet(e.response.data)   
+
                 },
                 complete: function (e) {
                   console.log('complete event.');
@@ -66,9 +70,52 @@
             columns: columns,
             resizable: true,
         });
+        }
 
 
-        
+      function generateSpreadsheet(data)
+      { 
+        // 初始化 Kendo UI Spreadsheet
+        $("#spreadsheet").kendoSpreadsheet();
+        // 获取Spreadsheet实例
+        var spreadsheet = $("#spreadsheet").data("kendoSpreadsheet");
+        // 获取默认工作表
+        var sheet = spreadsheet.activeSheet();
+        // 将后台传递的数据填充到电子表格中
+        console.log(data)
+        console.log(data.length)
+        for (var i = 0; i < data.length; i++) {
+            // var dfData = data[i]['data'];
+            var dfData = JSON.parse(data[i]['data'])
+            // console.log(dfData)
+            // console.log(typeof(dfData))
+            var sheetkeys = Object.keys(dfData[0]);
+  
+            var headerRow = sheet.range(1, 1, 1, sheetkeys.length);
+            headerRow.values([sheetkeys]); // 设置第一行的值
+            console.log(sheetkeys)
+            // var aData = Object.values(dfData[0]);
+            // console.log(aData)
+            
+            for (var j = 0; j < dfData.length; j++) {
+                var rowData = Object.values(dfData[j]);
+                var row = sheet.range(j+2, 1, j+2, rowData.length);
+                row.values([rowData]); // 设置数据行
+            }
+            console.log(dfData.length)
+            
+            var rowData = ['1全超人你', 0.9139, 0.8681, 95, 3.6171];
+            // 获取范围对象，假设您要填充到第二行（行索引从1开始）
+            var rowRange = sheet.range(0, 0, 0, rowData.length);
+            // 设置范围的值为数组
+            rowRange.values([rowData]);
+  
+            // 刷新电子表格以更新显示
+            spreadsheet.refresh();
+            
+        }
+
+
       }
 
 
