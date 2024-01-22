@@ -6,7 +6,7 @@
     <input name="files" id="fileUpload" type="file" />
 </form>
 <div id="gridContainer"></div>
-<div id="spreadsheet"></div>
+<div id="spreadsheet" style="width: 100%; height: 100vh;"></div>
 
 
 <script>
@@ -15,40 +15,48 @@
                 multiple: true,
                 async: {
                     'saveUrl': '/lims/handlevkeep',
-                    'autoUpload': false
+                    'autoUpload': false,
+                    'batch': true 
                 },
                 localization: {
-                    select: "上传文件进行处理",
-                    uploadSelectedFiles: "确定上传"
+                    select: "导入文件进行处理",
+                    uploadSelectedFiles: "确定导入",
+                    uploadSuccess: "导入成功",
+                    statusUploaded: "导入完成",
+                    statusUploading:"导入中",
+                    dropFilesHere: "将文件拖到此处导入",
+                    headerStatusUploading:"处理中，请耐心等候",
+                    headerStatusUploaded:"导入完成",
                 },
                 validation: {
                     allowedExtensions: ['CSV', 'XLS', 'XLSX'],
                 },
                 success: function (e) {
                     // 在上传成功后，获取后台返回的数据
-                    var responseData = e.response.data;
+                    // var responseData = e.response.data;
 
                     // 处理每个文件的数据
-                    responseData.forEach(function(fileData) {
-                        var gridId = 'grid_' + Math.floor(Math.random() * 1000);
-                        // 创建一个新的 <div> 用于放置 Grid
-                        $("#gridContainer").append('<div id="' + gridId + '"></div>');
-                        // 获取列定义
-                        var columns = [];
-                        fileData.columns.forEach(function(column) {
-                            columns.push({ field: column, title: column, width: 120 });
-                        });
+                    // responseData.forEach(function(fileData) {
+                    //     var gridId = 'grid_' + Math.floor(Math.random() * 1000);
+                    //     // 创建一个新的 <div> 用于放置 Grid
+                    //     $("#gridContainer").append('<div id="' + gridId + '"></div>');
+                    //     // 获取列定义
+                    //     var columns = [];
+                    //     fileData.columns.forEach(function(column) {
+                    //         columns.push({ field: column, title: column, width: 120 });
+                    //     });
                         
-
-                        // 创建 Kendo UI Grid
-                        generateGrid(gridId,fileData,columns)                        
+                    //     // 创建 Kendo UI Grid
+                    //     generateGrid(gridId,fileData,columns)                        
 
                         
-                    });
-                    generateSpreadsheet(e.response.data)   
+                    // });
+                    generateSpreadsheet(e.response.data,e.response.summary,e.response.chart)   
 
                 },
+                select: cleartable,
                 complete: function (e) {
+                  this.clearAllFiles();
                   console.log('complete event.');
                   console.log(e)
                 
@@ -56,9 +64,18 @@
                 },
             }
       ); 
+      function cleartable(e){
+        // alert('hhe')
+        var spreadsheet = $("#spreadsheet").data("kendoSpreadsheet");
+        if (spreadsheet) {
+        // 刷新电子表格以更新显示
+        spreadsheet.activeSheet().range(1,1,1000,1000).value('')
+        spreadsheet.refresh();
+        } 
+      }
       function generateGrid(gridId,fileData,columns)
       {
-        // console.log(fileData.data)
+
 
         $("#" + gridId).kendoGrid({
             dataSource: {
@@ -71,49 +88,121 @@
             resizable: true,
         });
         }
+      
+      function markborder(activerange,sheet)
+      {
+        activerange.forEachCell(function (row, column, cellProperties) {
+        /* The result can be observed in the DevTools(F12) console of the browser. */
+            sheet.range(row,column).borderBottom({ size: 1, color: "black" })
+            sheet.range(row,column).borderTop({ size: 1, color: "black" })
+            sheet.range(row,column).borderLeft({ size: 1, color: "black" })
+            sheet.range(row,column).borderRight({ size: 1, color: "black" })
+        });
+      }
 
-
-      function generateSpreadsheet(data)
+      function generateSpreadsheet(data,ps_data,chart_data)
       { 
+
         // 初始化 Kendo UI Spreadsheet
         $("#spreadsheet").kendoSpreadsheet();
+
         // 获取Spreadsheet实例
         var spreadsheet = $("#spreadsheet").data("kendoSpreadsheet");
         // 获取默认工作表
         var sheet = spreadsheet.activeSheet();
         // 将后台传递的数据填充到电子表格中
-        console.log(data)
-        console.log(data.length)
+        sheet.range(1,1000,1,10000).value('')
+        // 首先填入summary信息
+        sData = JSON.parse(ps_data)
+        console.log(sData)
+
+        var skeys = Object.keys(sData[0])
+        var sheaderRow = sheet.range(1, 1, 1, skeys.length);
+        sheaderRow.values([skeys]);
+        markborder(sheaderRow,sheet)
+
+        for(var j=0;j<sData.length;j++){
+            var rowData = Object.values(sData[j]);
+            var row = sheet.range(j+2, 1, 1, rowData.length);
+            row.values([rowData]); // 设置数据行
+            markborder(row,sheet)
+        }
+
+        
+        current_column=1
         for (var i = 0; i < data.length; i++) {
-            // var dfData = data[i]['data'];
+            //计算一下有多少列
             var dfData = JSON.parse(data[i]['data'])
-            // console.log(dfData)
-            // console.log(typeof(dfData))
             var sheetkeys = Object.keys(dfData[0]);
-  
-            var headerRow = sheet.range(1, 1, 1, sheetkeys.length);
+
+            var column_number = sheetkeys.length;
+            // 取出barcode
+            var barcode = data[i]['barcode']
+            console.log(barcode)
+            // 首先把barcode写到title
+            var title_row = 9+sData.length
+            var title_column = current_column
+
+            // console.log(title_row)
+            // console.log(title_column)
+
+            sheet.range(title_row, title_column, 1, column_number).merge();
+            sheet.range(title_row, title_column, 1, column_number).verticalAlign("center")
+            sheet.range(title_row, title_column, 1, column_number).textAlign("center")
+
+            console.log(barcode)
+
+            sheet.range(title_row, title_column,1,column_number).value(barcode);
+
+
+            sheetrange = sheet.range(title_row, title_column,1,column_number)
+            markborder(sheetrange,sheet)
+
+            // 然后写列名
+            var starting_row=10+sData.length
+            var starting_column=current_column
+
+
+            
+            
+
+            var headerRow = sheet.range(starting_row, starting_column, 1, sheetkeys.length);
             headerRow.values([sheetkeys]); // 设置第一行的值
             console.log(sheetkeys)
-            // var aData = Object.values(dfData[0]);
-            // console.log(aData)
+
+            markborder(headerRow,sheet)
             
+            // 最后把每一行都写进去
             for (var j = 0; j < dfData.length; j++) {
                 var rowData = Object.values(dfData[j]);
-                var row = sheet.range(j+2, 1, j+2, rowData.length);
+                var row = sheet.range(starting_row+j+1, starting_column, 1, rowData.length);
                 row.values([rowData]); // 设置数据行
+                markborder(row,sheet)
+                sheet.range(starting_row+j+1, starting_column+3, 1, 2).format("0.00%");
+
             }
             console.log(dfData.length)
+            current_column+=sheetkeys.length
             
-            var rowData = ['1全超人你', 0.9139, 0.8681, 95, 3.6171];
-            // 获取范围对象，假设您要填充到第二行（行索引从1开始）
-            var rowRange = sheet.range(0, 0, 0, rowData.length);
-            // 设置范围的值为数组
-            rowRange.values([rowData]);
-  
-            // 刷新电子表格以更新显示
-            spreadsheet.refresh();
+           
+           
             
         }
+         // 后面把画图的表格写进去
+        console.log(chart_data)
+        starting_column=current_column+2
+        // var chart_to_write = JSON.parse(chart_data)
+        // console.log(chart_to_write)
+        for (var j = 0; j < chart_data.length; j++) {
+            var rowData = Object.values(chart_data[j]);
+            var row = sheet.range(j+1, starting_column, 1, rowData.length);
+            row.values([rowData]); // 设置数据行
+            markborder(row,sheet)
+            sheet.range(j+2, starting_column, 1, rowData.length).format("0.00%");
+
+        }
+         // 刷新电子表格以更新显示
+        spreadsheet.refresh();
 
 
       }
