@@ -6,4 +6,6 @@ urlpatterns = [
     path('', views.base, name='base'),
     path('vkeepexcel', views.vkeepexcel,name='vkeepexcel'),
     path('handlevkeep', views.handlevkeep,name='handlevkeep'),
+    path('cyclesort', views.cyclesort,name='cyclesort'),
+    path('handlecycle', views.handlecycle,name='handlecycle'),
 ]
