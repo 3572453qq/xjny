@@ -7,6 +7,7 @@ variables:
 scp_files_to_production_server:
   stage: scp_files_to_production_server
   script:
+    - id
     - echo $CI_COMMIT_SHA
     - echo $IDENTITY
     - files=`git diff-tree --no-commit-id --name-only -r $CI_COMMIT_SHA`;echo $files
