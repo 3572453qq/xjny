@@ -1,0 +1,23 @@
+stages: #阶段
+  - scp_files_to_production_server
+
+variables:
+  BASEDIR: "/data/django/xjny/"
+  REMOTEHOST: 172.28.20.105
+scp_files_to_production_server:
+  stage: scp_files_to_production_server
+  script:
+    - echo $CI_COMMIT_SHA
+    - files=`git diff-tree --no-commit-id --name-only -r $CI_COMMIT_SHA`;echo $files
+    - chmod 600 $IDENTITY
+    - for file in $files ;do scp -i $IDENTITY ./$file root@$REMOTEHOST:/$BASEDIR/$file ;done
+    - ssh -i $IDENTITY root@$REMOTEHOST "supervisorctl stop xjny:*"
+    - ssh -i $IDENTITY root@$REMOTEHOST "cd $BASEDIR; python3 manage.py makemigrations;python3 manage.py migrate"
+    - ssh -i $IDENTITY root@$REMOTEHOST "supervisorctl start xjny:*"
+    - ssh -i $IDENTITY root@$REMOTEHOST "echo 'hello1' > /tmp/1.txt"
+  only:
+    - dev
+    - master
+
+  tags:
+    - "103"

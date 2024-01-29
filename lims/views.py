@@ -201,15 +201,7 @@ def handlecycle(request):
 
     if request.method == 'POST' and request.FILES.getlist('files'):
         response_data = []
-        summary_data = []
-        # print('hello')
-        # print( request.FILES.getlist('files'))
-        
-
-        # for afile in request.FILES.getlist('files'): 
-        #     df_result = pd.read_excel(afile,sheet_name='Cycle',header=[0, 1])  
-        #     print(df_result)
-
+ 
         afile = request.FILES.getlist('files')[0]
         df_result = pd.read_excel(afile,sheet_name='Cycle',header=[0, 1])  
         # print(df_result)
@@ -235,7 +227,7 @@ def handlecycle(request):
             # 去掉nan的，以及第一行和最后一行
             df_sub_result = df_sub_result.dropna(how='all')
             df_sub_result = df_sub_result.drop([0, df_sub_result.index[-1]])
-            
+
             df_sub_result['保持率'] = (df_sub_result['放电容量(Ah)'] / df_sub_result['放电容量(Ah)'].iloc[0] ).round(4)
             df_sub_result['库伦效率'] = (df_sub_result['放电容量(Ah)'] / df_sub_result['充电容量(Ah)'] ).round(4)
             
