@@ -8,7 +8,7 @@ scp_files_to_production_server:
   stage: scp_files_to_production_server
   script:
     - echo $CI_COMMIT_SHA
-    - echo $IDENTITY 
+    - echo $IDENTITY
     - files=`git diff-tree --no-commit-id --name-only -r $CI_COMMIT_SHA`;echo $files
     - chmod 600 $IDENTITY
     # - for file in $files ;do scp -i $IDENTITY ./$file root@$REMOTEHOST:/$BASEDIR/$file ;done
