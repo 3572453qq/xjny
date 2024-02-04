@@ -10,4 +10,6 @@ urlpatterns = [
     path('handlecycle', views.handlecycle,name='handlecycle'),
     path('base_test', views.base_test,name='base_test'),
     path('cycles', views.cycles,name='cycles'),
+    path('handlecrate', views.handlecrate,name='handlecrate'),
+    path('crate', views.crate,name='crate'),
 ]

@@ -19,6 +19,12 @@ import math
 from openpyxl.utils import get_column_letter
 import base64
 
+
+border_style = Border(left=Side(border_style='thin'),
+                    right=Side(border_style='thin'),
+                    top=Side(border_style='thin'),
+                    bottom=Side(border_style='thin'))
+
 def copy_excel_to_tmp(src_file_path):
     # 获取原始文件名和扩展名
     file_name, file_extension = os.path.splitext(os.path.basename(src_file_path))
@@ -133,6 +139,9 @@ def cyclesort(request):
 def cycles(request):
     return render(request,'lims/cycles.html')
 
+def crate(request):
+    return render(request,'lims/crate.html')
+
 
 def write_dataframes_to_excel(input_excel_path, dataframes_with_titles,summary_result):
     # Load existing workbook
@@ -146,10 +155,7 @@ def write_dataframes_to_excel(input_excel_path, dataframes_with_titles,summary_r
     percent_style = NamedStyle(name='percent_style', number_format='0.00%')
     wb.add_named_style(percent_style)
 
-    border_style = Border(left=Side(border_style='thin'),
-                      right=Side(border_style='thin'),
-                      top=Side(border_style='thin'),
-                      bottom=Side(border_style='thin'))
+
 
     # 写入summary数据区域
     for rownum,row in enumerate(summary_result, start=2):
@@ -262,4 +268,58 @@ def handlecycle(request):
 
         return JsonResponse(response_data)
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+def crate_sheet(result_file,df,sheet_name):
+    print(result_file)
+    grouped_df = df.groupby('工步号')
+
+    if os.path.isfile(result_file):
+        writer = pd.ExcelWriter(result_file, engine='openpyxl', mode='a',if_sheet_exists='overlay') 
+    else:
+        writer = pd.ExcelWriter(result_file, engine='xlsxwriter') 
+       
+    start_col = 0        
+    for group_name, group_df in grouped_df:
+        print(f"工步号: {group_name}")
+        print(group_df)
+        print("-------------------")
+        group_df.to_excel(writer, sheet_name=sheet_name, startcol=start_col, index=False)
+        start_col = len(group_df.columns)+start_col
+    writer.close()
+
+
+          
+
+
+def handlecrate(request):  
+
+    if request.method == 'POST' and request.FILES.getlist('files'):
+        response_data = []
+
+        # for afile in  request.FILES.getlist('files'):
+        afile = request.FILES.getlist('files')[0]
+        # 生成5位随机数字
+        random_number = ''.join(random.choices(string.digits, k=5))
+
+        result_file = '/tmp/r'+random_number+afile.name 
+        df_record = pd.read_excel(afile,sheet_name='record',header=[0]) 
+
+        df_disch = df_record[df_record['工步类型'] == '恒流放电'][['工步号','电压(V)','容量(Ah)']]
+        crate_sheet(result_file,df_disch,'恒流放电') 
+
+        df_chg = df_record[df_record['工步类型'] == '恒流恒压充电'] [['工步号','电压(V)','容量(Ah)']]
+        crate_sheet(result_file,df_chg,'恒流恒压充电') 
+            
+        with open(result_file, 'rb') as file:
+                encoded_data = base64.b64encode(file.read()).decode('utf-8')
+
+            # Provide the processed file data and name in the response
+        response_data = {
+            'file_data': encoded_data,
+            'file_name': 'result_'+afile.name
+        }
+        
+
+        return JsonResponse(response_data)
     
+    return JsonResponse({'error': 'Invalid request'}, status=400)
