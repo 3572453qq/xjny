@@ -8,4 +8,6 @@ urlpatterns = [
     path('handlevkeep', views.handlevkeep,name='handlevkeep'),
     path('cyclesort', views.cyclesort,name='cyclesort'),
     path('handlecycle', views.handlecycle,name='handlecycle'),
+    path('base_test', views.base_test,name='base_test'),
+    path('cycles', views.cycles,name='cycles'),
 ]

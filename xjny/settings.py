@@ -17,15 +17,18 @@ import os
 from django_auth_ldap.config import LDAPSearch
 # settings.py
 
-import ldap3
+
 
 AUTH_LDAP_SERVER_URI = 'ldap://172.28.1.254'  # 替换为你的AD服务器地址
-AUTH_LDAP_BIND_DN = 'CN=administrator,OU=Users,DC=xworld,DC=com'  # 替换为你的绑定DN
+AUTH_LDAP_AUTHORIZE_ALL_USERS = True
+AUTH_LDAP_BIND_DN = 'CN=Administrator,CN=Users,DC=xworld,DC=com'  # 替换为你的绑定DN
 AUTH_LDAP_BIND_PASSWORD = 'xinshijie@2023'  # 替换为你的绑定密码
-AUTH_LDAP_USER_SEARCH = ldap3.ALL  # 使用默认的用户搜索设置
+AUTH_LDAP_USER_SEARCH = LDAPSearch(
+    "OU=inx,DC=xworld,DC=com", ldap.SCOPE_SUBTREE, "(samAccountName=%(user)s)")
+AUTH_LDAP_ALWAYS_UPDATE_USER = True
 
 AUTHENTICATION_BACKENDS = [
-    # 'django_auth_ldap.backend.LDAPBackend',
+    'django_auth_ldap.backend.LDAPBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
@@ -152,6 +155,30 @@ MEDIA_ROOT =  BASE_DIR / 'images'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/djangologfile.log',  # 替换成实际的日志文件路径
+        },
+    },
+    'loggers': {
+        'django_auth_ldap': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    }
+}
 # LOGGING = {
 #     'version': 1,
 #     'disable_existing_loggers': False,

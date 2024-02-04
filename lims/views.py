@@ -43,10 +43,13 @@ def copy_excel_to_tmp(src_file_path):
 
 # Create your views here.
 def base(request):
-    return render(request,'base.html')
+    return render(request,'lims/base.html')
+
+def base_test(request):
+    return render(request,'lims/base_test.html')
 
 def vkeepexcel(request):
-    return render(request,'vkeepexcel.html')
+    return render(request,'lims/vkeepexcel.html')
 
 def handlevkeep(request):
     if request.method == 'POST' and request.FILES.getlist('files'):
@@ -125,7 +128,10 @@ def handlevkeep(request):
 
 
 def cyclesort(request):
-    return render(request,'cyclesort.html')
+    return render(request,'lims/cyclesort.html')
+
+def cycles(request):
+    return render(request,'lims/cycles.html')
 
 
 def write_dataframes_to_excel(input_excel_path, dataframes_with_titles,summary_result):
