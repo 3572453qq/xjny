@@ -29,7 +29,7 @@ def copy_excel_to_tmp(src_file_path):
     # 获取原始文件名和扩展名
     file_name, file_extension = os.path.splitext(os.path.basename(src_file_path))
 
-    # 生成5位随机数字
+    # 生成7位随机数字
     random_number = ''.join(random.choices(string.digits, k=7))
 
     # 获取当前日期并格式化为YYYYMMDD

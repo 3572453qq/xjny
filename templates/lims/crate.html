@@ -1,6 +1,23 @@
 {% extends 'lims/base_ui.html' %}
-{% block title %}导出测试结果报表{% endblock %}
+{% block title %}倍率数据处理{% endblock %}
 {% block content %}
+<div class="row mt-4">
+    <div class="col-lg-7 mb-lg-0 mb-4">
+      <div class="card">
+        <div class="card-body p-3">
+          <div class="row">
+            <div class="col-lg-6">
+              <div class="d-flex flex-column h-100">
+                <p class="mb-1 pt-2 text-bold">测试中心exel生成工具</p>
+                <h5 class="font-weight-bolder">倍率数据处理</h5>
+                <p class="mb-5">请上传相应的原始文档（文档中须含有record这个sheet），然后下载所需要的倍率excel</p>                
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
 
 <form method="post" style="width:500px">
     <input name="files" id="fileUpload" type="file" />

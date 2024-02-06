@@ -1,6 +1,6 @@
-{% extends 'lims/base_ui.html' %}
+{% extends 'lims/base.html' %}
 {% block title %}导出测试结果报表{% endblock %}
-{% block content %}
+{% block body_block %}
 
 <form method="post" style="width:500px">
     <input name="files" id="fileUpload" type="file" />
@@ -53,4 +53,4 @@
 
 </script>
 
-{% endblock content %}
+{% endblock %}
