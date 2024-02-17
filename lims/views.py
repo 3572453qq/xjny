@@ -18,7 +18,9 @@ from openpyxl.styles import Border, Side
 import math
 from openpyxl.utils import get_column_letter
 import base64
-
+import pymysql
+import multiprocessing
+from lims.models import *
 
 border_style = Border(left=Side(border_style='thin'),
                     right=Side(border_style='thin'),
@@ -56,6 +58,12 @@ def base_test(request):
 
 def vkeepexcel(request):
     return render(request,'lims/vkeepexcel.html')
+
+def querycycle(request):
+    context_dict = {'module': 'lims'}
+    all_teams = list(teams.objects.values())
+    context_dict['teams']=all_teams
+    return render(request,'lims/querycycle.html',context_dict)
 
 def handlevkeep(request):
     if request.method == 'POST' and request.FILES.getlist('files'):
@@ -323,3 +331,254 @@ def handlecrate(request):
         return JsonResponse(response_data)
     
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+def query_database(host,user,password,db,query):
+    # 连接到MySQL数据库
+    connection = pymysql.connect(host=host, user=user, password=password, db=db)
+    try:
+        with connection.cursor() as cursor:
+            # 执行查询语句
+            cursor.execute(query)            
+            ls_desc = cursor.description
+        ls_columns = []
+        for i, ls_column_tuple in enumerate(ls_desc):
+            ls_column = ls_column_tuple[0]
+            if len(ls_column) < 1:
+                ls_column = str(i)
+
+            ls_formated_column = re.sub('\W+', '_', ls_column)
+            ls_formated_column = 'a' + \
+                ls_formated_column if re.match(
+                    '^[0-9]', ls_formated_column) else ls_formated_column
+
+            ls_columns.append(ls_formated_column)
+        all_lines = []
+        for a_line in cursor.fetchall():
+            a_data = dict(zip(ls_columns, a_line))
+            all_lines.append(a_data)        
+        return (all_lines,ls_columns)
+    finally:
+        connection.close()
+
+def getcycledata1(request):
+    start_date = request.POST.get('startdate')
+    end_date = request.POST.get('enddate')
+    db_name = request.POST.get('dbname')
+    team_id = request.POST.get('teamid')
+    print(start_date, end_date,db_name)
+    is_ok=1
+    try:
+        db_host, db_user, db_pass = '172.28.20.100','root','Abc_12345'
+
+        con = pymysql.connect(host=db_host, user=db_user,
+                                password=db_pass, database=db_name)
+        cursor = con.cursor(cursor=pymysql.cursors.Cursor)
+
+        start_table = 'cycle'+start_date
+        end_table = 'cycle'+end_date
+
+        select_table_name = f'''SELECT table_name 
+            FROM INFORMATION_SCHEMA.TABLES
+            where table_name between '{start_table}' and '{end_table}'
+            and table_schema='yanfa' '''
+        
+        cursor.execute(select_table_name)
+        # 构建选择数据的sql
+        tables = [table[0] for table in cursor.fetchall()]
+        print(tables)
+        select_cycle_data = f'''SELECT * FROM {(' UNION ALL SELECT * FROM '.join(tables))} 
+                                order by dev_unit_chl,test_id,cycle_id;'''
+        print(select_cycle_data)
+        cursor.execute(select_cycle_data)
+        # cursor.execute('select * from cycle20240213 order by dev_unit_chl,test_id,cycle_id')
+
+        ls_desc = cursor.description
+        # log_addition(request.user, pagepermission,
+        #                 'sql execution:['+ls_sqlstr+'] on ['+ls_connstr+']')  # 记录日志
+    except Exception as e:
+        is_ok =0 
+        ls_data = {"isok": is_ok, "errmsg": str(e)}
+        return JsonResponse(ls_data)
+    
+    ls_columns = []
+
+    # print(ls_desc)
+
+    for i, ls_column_tuple in enumerate(ls_desc):
+        ls_column = ls_column_tuple[0]
+        if len(ls_column) < 1:
+            ls_column = str(i)
+
+        ls_formated_column = re.sub('\W+', '_', ls_column)
+        ls_formated_column = 'a' + \
+            ls_formated_column if re.match(
+                '^[0-9]', ls_formated_column) else ls_formated_column
+        # print('column is',ls_formated_column)
+        ls_columns.append(ls_formated_column)
+
+    print('here are the columns', ls_columns)
+
+    all_lines = []
+    for a_line in cursor.fetchall():
+        a_data = dict(zip(ls_columns, a_line))
+        all_lines.append(a_data)
+
+    cursor.close()
+    con.close()
+
+    ls_data = {'data': all_lines, 'total': len(
+        all_lines), 'columns': ls_columns, "isok": is_ok}
+
+    return JsonResponse(ls_data)
+
+
+def getcycledata(request):       
+    start_date = request.POST.get('startdate')
+    end_date = request.POST.get('enddate')
+    db_name = request.POST.get('dbname')
+    team_id = request.POST.get('teamid')
+    cycle_count = int(request.POST.get('cyclecount'))
+    chg_efficiency = float(request.POST.get('chgefficiency'))/100
+
+    print(start_date, end_date,db_name,team_id,cycle_count,chg_efficiency)
+    is_ok=1
+
+    all_computers = list(teamcomputer.objects.filter(
+        teamid=team_id).values('computer_name'))
+    
+    print('this is all computers',all_computers)
+    computer_names = [k['computer_name'] for k in all_computers]
+    print('this is computer_names',computer_names)
+
+    try:
+        db_host, db_user, db_pass = '172.28.20.100','root','Abc_12345'
+        con = pymysql.connect(host=db_host, user=db_user,
+                                password=db_pass, database=db_name)
+        cursor = con.cursor(cursor=pymysql.cursors.Cursor)
+
+        start_table = 'cycle'+start_date
+        end_table = 'cycle'+end_date
+
+        select_table_name = f'''SELECT table_name 
+            FROM INFORMATION_SCHEMA.TABLES
+            where table_name between '{start_table}' and '{end_table}'
+            and table_schema='{db_name}' '''
+        
+        cursor.execute(select_table_name)
+        # 构建选择数据的sql
+        tables = [table[0] for table in cursor.fetchall()]
+        print('here is the',tables)
+        str_test = "','".join(computer_names)
+        print(str_test)
+        
+        where_clause = f''' where computer_name in ('{"','".join(computer_names)}') '''
+        print(where_clause)
+        #  select_cycle_data = f'''SELECT * FROM {(' UNION ALL SELECT * FROM '.join(tables))} 
+        #                         order by dev_unit_chl,test_id,cycle_id;'''
+
+        queries = ['SELECT * FROM '+table+where_clause for table in tables]
+        pool = multiprocessing.Pool()
+        process_results = []
+
+        for query in queries:
+            process = pool.apply_async(query_database, (db_host,db_user,db_pass,db_name,query))
+            process_results.append((process, query))
+    
+        pool.close()
+        pool.join()
+        result = []
+        for process, query in process_results:
+            print('Query: {}'.format(query))
+            result+=process.get()[0]
+            ls_columns=process.get()[1]          
+
+    except Exception as e:
+        is_ok =0 
+        ls_data = {"isok": is_ok, "errmsg": str(e)}
+        return JsonResponse(ls_data)
+    
+
+    cursor.close()
+    con.close()
+     
+    # print(result)
+    print(len(result)) 
+    if len(result) == 0:
+        ls_data = {"isok": 0, "errmsg": '无记录'}
+        return JsonResponse(ls_data)
+    
+    
+
+
+    # 将原始字典列表转换成 DataFrame
+    df = pd.DataFrame(result)
+
+    # 按test_id和dev_unit_chl进行分组
+    grouped = df.groupby(['test_id', 'dev_unit_chl'],as_index=False)
+
+    # 初始化一个空的DataFrame，用于存储符合条件的组
+    filtered_df = pd.DataFrame()
+
+    # 遍历每个分组
+    for name, group in grouped:
+        # print(group['discharge_capacity'] / group['charge_capacity'])
+        
+        # 检查每个组是否超过20行，并且第18行的efficiency值是否超过80
+        group['保持率'] = (group['discharge_capacity'] / group['discharge_capacity'].iloc[0] ).round(4)
+        group['库伦效率'] = (group['discharge_capacity'] / group['charge_capacity'] ).round(4)
+        # print(name, group)
+        if len(group) >= cycle_count:
+            first_k_rows = group.iloc[2:cycle_count-1]
+            all_greater_than_08 = (first_k_rows['保持率'] > chg_efficiency).all()
+
+            # and group.iloc[cycle_count-1]['保持率'] > chg_efficiency:
+            # 如果符合条件，则将这个组添加到新的DataFrame中
+            if all_greater_than_08:
+                print(name,'满足条件')
+                filtered_df = pd.concat([filtered_df, group])
+
+    if(len(filtered_df.to_dict(orient='records')))<1:
+        ls_data = {"isok": 0, "errmsg": '无满足条件的记录'}
+        return JsonResponse(ls_data)
+
+    print(filtered_df.columns.tolist())
+
+    # 根据某个字段排序
+    df_sorted = filtered_df.sort_values(by=['dev_unit_chl','test_id','cycle_id'])
+
+    # 得到所有字段名称
+    ls_columns = df_sorted.columns.tolist()
+    print('here are all the columns',ls_columns) 
+
+
+
+    # 将排序后的 DataFrame 转换回字典列表
+    result = df_sorted.to_dict(orient='records')
+
+    print('total count is:',len(result))
+    lenthofresult = len(result)
+    if(lenthofresult>5000):
+        print('in sending file part')
+        random_number = ''.join(random.choices(string.digits, k=5))
+        result_file = '/tmp/getcycledata'+random_number+'.xlsx'
+
+        # ls_data = {"isok": 0, "errmsg": '数量超过5000，请直接下载excel文件'}
+        df_sorted.to_excel(result_file, index=False)
+
+        with open(result_file, 'rb') as file:
+            encoded_data = base64.b64encode(file.read()).decode('utf-8')
+
+            # Provide the processed file data and name in the response
+        ls_data = {
+            'isok': 2,
+            "errmsg": f'数量超过5000，共{lenthofresult}行,请直接下载excel文件',
+            'file_data': encoded_data,
+            'file_name': result_file
+        }
+        return JsonResponse(ls_data)
+    else:
+        print('小于5000行')
+        ls_data = {'data': result, 'total': len(
+            result), 'columns': ls_columns, "isok": is_ok}
+
+        return JsonResponse(ls_data)

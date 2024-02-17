@@ -12,4 +12,6 @@ urlpatterns = [
     path('cycles', views.cycles,name='cycles'),
     path('handlecrate', views.handlecrate,name='handlecrate'),
     path('crate', views.crate,name='crate'),
+    path('querycycle', views.querycycle,name='querycycle'),
+    path('getcycledata', views.getcycledata,name='getcycledata'),
 ]

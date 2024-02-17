@@ -72,6 +72,32 @@
       }
       Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
     }
+    function check_session_timeout() {
+
+    page_load_time = new Date().getTime();
+    active_seconds = (new Date().getTime() - page_load_time) / 1000;
+    // alert(active_seconds)
+    if (active_seconds >= 30) {
+        alert('会话超时，将重新登录')
+        window.location = '/lims/index';
+    }}
+    //将num左补0为len长度的字符串
+    function lpadNum(num, len) {
+            var l = num.toString().length;
+            while(l < len) {
+                num = "0" + num;
+                l++;
+            }
+            return num;
+        }
+    //将传入的Date格式化为"yyyyMMdd"
+    function formatDate(d){
+        var year = d.getFullYear();
+        var month = d.getMonth() + 1;
+        var day = d.getDate();
+        var resStr = year + lpadNum(month, 2) + lpadNum(day, 2) ;
+        return resStr;
+    }
 </script>
 
 <!-- Github buttons -->
