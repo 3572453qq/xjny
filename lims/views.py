@@ -464,6 +464,7 @@ def getcycledata(request):
             where table_name between '{start_table}' and '{end_table}'
             and table_schema='{db_name}' '''
         
+        print(select_table_name)
         cursor.execute(select_table_name)
         # 构建选择数据的sql
         tables = [table[0] for table in cursor.fetchall()]
@@ -473,10 +474,10 @@ def getcycledata(request):
         
         where_clause = f''' where upper(computer_name) in ('{"','".join(computer_names)}') '''
         print(where_clause)
-        #  select_cycle_data = f'''SELECT * FROM {(' UNION ALL SELECT * FROM '.join(tables))} 
-        #                         order by dev_unit_chl,test_id,cycle_id;'''
+        
 
         queries = ['SELECT * FROM '+table+where_clause for table in tables]
+        print(queries)
         pool = multiprocessing.Pool()
         process_results = []
 
