@@ -525,11 +525,12 @@ def getcycledata(request):
     for name, group in grouped:
         # print(group['discharge_capacity'] / group['charge_capacity'])
         
-        # 检查每个组是否超过20行，并且第18行的efficiency值是否超过80
-        group['保持率'] = (group['discharge_capacity'] / group['discharge_capacity'].iloc[0] ).round(4)
-        group['库伦效率'] = (group['discharge_capacity'] / group['charge_capacity'] ).round(4)
+        
         # print(name, group)
         if len(group) >= cycle_count:
+            # 检查每个组是否超过一定行，并且前面行的保持率都大于指定值
+            group['保持率'] = (group['discharge_capacity'] / group['discharge_capacity'].iloc[1] ).round(4)
+            group['库伦效率'] = (group['discharge_capacity'] / group['charge_capacity'] ).round(4)
             first_k_rows = group.iloc[2:cycle_count-1]
             all_greater_than_08 = (first_k_rows['保持率'] > chg_efficiency).all()
 
