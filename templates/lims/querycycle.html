@@ -167,6 +167,7 @@
                 check_session_timeout()
                 button_id = event.target.id
 
+                this.enable(false);
                 // alert($("#datepickerstart").data("kendoDatePicker").value())
                 // alert($("#datepickerend").data("kendoDatePicker").value())
 
@@ -229,6 +230,7 @@
                         $("#time").kendoTextBox({
                             value: "耗时："+timeInSeconds.toString()+"秒"
                           });
+                          $("#getdata").data("kendoButton").enable(true);
                     }
                 });
 
@@ -265,7 +267,7 @@
           },
           columns: columns,
         //   pageable: {pageSize: gridpagesize},
-          pageable: {pageSize: 20},
+          pageable: {pageSize: 10},
           editable:false,
           sortable: true,
           resizable: true,
