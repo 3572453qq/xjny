@@ -119,7 +119,24 @@
           dataTextField: "teamname",
           dataValueField: "id",
           index:4,
-          dataSource: dataSource
+          dataSource: dataSource,
+          change: function(e) {
+                    // 获取选中的值
+                    
+                    var selectedValue = this.value();
+
+                    // 根据选中的值更新单选按钮
+                    if(selectedValue=='4'){   //选择的测试
+                      document.getElementById("option2").checked = false; 
+                      document.getElementById("option1").checked = true;
+                    }
+                    else{  //选择的研发
+                      document.getElementById("option2").checked = true;
+                      document.getElementById("option1").checked = false;
+                    } 
+
+                    
+                }
         });
 
         $("#numeric1").kendoNumericTextBox(

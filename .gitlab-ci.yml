@@ -10,7 +10,7 @@ scp_files_to_production_server:
     - id
     - echo $CI_COMMIT_SHA
     - echo $IDENTITY
-    - files=`git diff-tree --no-commit-id --name-only -r 780ae92e0c5df168202ceccb2615ffc8c3c080d1`;echo $files
+    - files=`git diff-tree --no-commit-id --name-only -r $CI_COMMIT_SHA`;echo $files
     # - chmod 600 $IDENTITY
     - for file in $files ;do scp -i $IDENTITY ./$file root@$REMOTEHOST:/$BASEDIR/$file ;done
     - ssh -i $IDENTITY root@$REMOTEHOST "supervisorctl stop xjny:*"
