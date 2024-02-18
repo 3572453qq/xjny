@@ -21,6 +21,7 @@ import base64
 import pymysql
 import multiprocessing
 from lims.models import *
+import numpy as np
 
 border_style = Border(left=Side(border_style='thin'),
                     right=Side(border_style='thin'),
@@ -546,6 +547,9 @@ def getcycledata(request):
 
     # 根据某个字段排序
     df_sorted = filtered_df.sort_values(by=['dev_unit_chl','test_id','cycle_id'])
+    df_sorted.fillna(0, inplace=True)
+    df_sorted.replace([np.inf, -np.inf], 0, inplace=True)
+    df_sorted = df_sorted[['dev_unit_chl','test_id','cycle_id','保持率','库伦效率']]
 
     # 得到所有字段名称
     ls_columns = df_sorted.columns.tolist()
@@ -559,7 +563,7 @@ def getcycledata(request):
     print('total count is:',len(result))
     lenthofresult = len(result)
     if(lenthofresult>5000):
-        print('in sending file part')
+        print('大于5000，in sending file part')
         random_number = ''.join(random.choices(string.digits, k=5))
         result_file = '/tmp/getcycledata'+random_number+'.xlsx'
 
@@ -579,7 +583,12 @@ def getcycledata(request):
         return JsonResponse(ls_data)
     else:
         print('小于5000行')
+        # print(result)
+        
         ls_data = {'data': result, 'total': len(
             result), 'columns': ls_columns, "isok": is_ok}
+        
+        with open("data.json", "w") as f:
+            json.dump(ls_data, f)
 
         return JsonResponse(ls_data)
