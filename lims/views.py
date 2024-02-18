@@ -471,7 +471,7 @@ def getcycledata(request):
         str_test = "','".join(computer_names)
         print(str_test)
         
-        where_clause = f''' where computer_name in ('{"','".join(computer_names)}') '''
+        where_clause = f''' where upper(computer_name) in ('{"','".join(computer_names)}') '''
         print(where_clause)
         #  select_cycle_data = f'''SELECT * FROM {(' UNION ALL SELECT * FROM '.join(tables))} 
         #                         order by dev_unit_chl,test_id,cycle_id;'''
