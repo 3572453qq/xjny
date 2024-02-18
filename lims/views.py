@@ -549,7 +549,7 @@ def getcycledata(request):
     df_sorted = filtered_df.sort_values(by=['dev_unit_chl','test_id','cycle_id'])
     df_sorted.fillna(0, inplace=True)
     df_sorted.replace([np.inf, -np.inf], 0, inplace=True)
-    df_sorted = df_sorted[['dev_unit_chl','test_id','cycle_id','保持率','库伦效率']]
+    # df_sorted = df_sorted[['dev_unit_chl','test_id','cycle_id','保持率','库伦效率']]
 
     # 得到所有字段名称
     ls_columns = df_sorted.columns.tolist()
@@ -588,7 +588,7 @@ def getcycledata(request):
         ls_data = {'data': result, 'total': len(
             result), 'columns': ls_columns, "isok": is_ok}
         
-        with open("data.json", "w") as f:
-            json.dump(ls_data, f)
+        # with open("data.json", "w") as f:
+        #     json.dump(ls_data, f)
 
         return JsonResponse(ls_data)
