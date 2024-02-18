@@ -93,9 +93,7 @@
     //将传入的Date格式化为"yyyyMMdd"
     function formatDate(d){
         var year = d.getFullYear();
-        alert(year)
         var month = d.getMonth() + 1;
-        alert(month)
         var day = d.getDate();
         var resStr = ''+year + lpadNum(month, 2) + lpadNum(day, 2) ;
         return resStr;
