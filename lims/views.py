@@ -514,6 +514,15 @@ def getcycledata(request):
 
     # 将原始字典列表转换成 DataFrame
     df = pd.DataFrame(result)
+    print('合并后df的长度：',len(df))
+
+    # 去重
+    # 根据字段 进行分组，找到每个分组中 cycle_id 值最小的行的索引
+    idx_to_keep = df.groupby(['dev_unit_chl', 'test_id', 'Test_StartTime', 'EndTime'])['cycle_id'].idxmin()
+    # 使用这些索引过滤 DataFrame，确保保留所有列的值
+    df = df.loc[idx_to_keep]
+    print('去重后df的长度：',len(df))
+
 
     # 按test_id和dev_unit_chl进行分组
     grouped = df.groupby(['test_id', 'dev_unit_chl'],as_index=False)
