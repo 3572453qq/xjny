@@ -18,6 +18,12 @@
   .k-numeric-wrap {
           width: 60px; /* 设置 NumericTextBox 的宽度 */
       }
+  #option1,#option2 {
+            display: none; /* 设置 display 属性为 none，隐藏元素 */
+        }
+  .k-grid {
+            font-size: 12px !important;
+        }
 
 </style>
 
@@ -27,9 +33,9 @@
       <input id="datepickerstart" />
       <input id="datepickerend" />
       <input type="radio" id="option1" name="options" value="uat" checked>
-      <label for="option1">测试中心</label>
+      <!-- <label for="option1">测试中心</label> -->
       <input type="radio" id="option2" name="options" value="yanfa">
-      <label for="option2">研发中心</label>
+      <!-- <label for="option2">研发中心</label> -->
       <input id="kd-place-chooser" />
 
 
@@ -37,12 +43,18 @@
       <input id="numeric1" class="k-numerictextbox" style="width: 100px;" />
       <label for="numeric2">次后，保持率高于:</label>
       <input id="numeric2" class="k-numerictextbox" style="width: 100px;" />
+
+      <label for="fs">向前搜索:</label>
+      <input id="fs" class="k-numerictextbox" style="width: 100px;" />
+      <label for="bs">向后搜索:</label>
+      <input id="bs" class="k-numerictextbox" style="width: 100px;" />
             
     </div>
     <button type='button' class='btn btn-primary' id="getdata">获取数据</button>
-    <div id="result">
-
-    </div>
+    <div id="result"> </div>
+    <img id="image"  src="" alt="Image">
+    <div id="imagecontainer"></div>
+    <div id="resultdetail"> </div>
     </br>
     <input id="quit" type="button" value="退出">
     <div >
@@ -151,6 +163,19 @@
             format: "n0"
           }
         );
+
+        $("#fs").kendoNumericTextBox(
+          {
+            value: 2,
+            format: "n0"
+          }
+        );
+        $("#bs").kendoNumericTextBox(
+          {
+            value: 2,
+            format: "n0"
+          }
+        );fs
                 
     });
     
@@ -185,15 +210,19 @@
                 var cyclecount = $("#numeric1").data("kendoNumericTextBox").value();
                 var chgefficiency  = $("#numeric2").data("kendoNumericTextBox").value();
 
-
+                var fs = $("#fs").data("kendoNumericTextBox").value();
+                var bs  = $("#bs").data("kendoNumericTextBox").value();
 
                 $("#result").empty();
-                $("#result").html('正在执行，等待加载结果，请耐心等候。。。')
+                $("#result").html('正在执行，等待加载结果，通常需要1-3分钟以上，请耐心等候。。。')
+                $("#resultdetail").empty();
+                
+                document.getElementById("image").src = "";
                 
                 $.ajax({
                     // async: false,
                     type: 'POST',
-                    url: '/lims/getcycledata',
+                    url: '/lims/handlecyclesummary',
                     data: {
                         'startdate': startdate,
                         'enddate':enddate,
@@ -201,7 +230,8 @@
                         'teamid': teamid,
                         'cyclecount':cyclecount,
                         'chgefficiency':chgefficiency,
-
+                        'fs':fs,
+                        'bs':bs
                     },
                     dataType: "json",
                     success: function (result) {
@@ -221,8 +251,33 @@
                         }                       
                         else
                         { 
-                            
-                            generateGrid(result);
+                            generateGrid('result',result['summarydata']);
+                            // 设置图片
+                            var base64ImageData = "data:image/jpeg;base64,"+result['resultdatalist'][0]['img']
+                            // var base64ImageData = ""
+                            document.getElementById("image").src = base64ImageData;
+                            $("#result").data("kendoGrid").select("tr:eq(0)");
+
+                            generateGrid('resultdetail',result['resultdatalist'][0]);
+                            $("#result").data("kendoGrid").bind("change", function (e) {
+                              // 获取当前选中的行数据
+                              var selectedRows = this.select();                              
+                              var dataItem = $("#result").data("kendoGrid").dataItem(selectedRows.first());
+                              var columnAValue = dataItem.get("序号");
+
+                              var base64ImageData = "data:image/jpeg;base64,"+result['resultdatalist'][columnAValue]['img']
+                              // var base64ImageData = ""
+                              document.getElementById("image").src = "";
+                              document.getElementById("image").src = base64ImageData;
+                              // 创建一个 <img> 元素
+                              // var imgElement = document.createElement("img");
+                              // imgElement.src = base64ImageData;
+                              // var imageContainer = document.getElementById("imagecontainer");
+                              // imageContainer.appendChild(imgElement);
+                              generateGrid('resultdetail',result['resultdatalist'][columnAValue]);
+                              
+                         
+                          });
                         }
                         var endTime = new Date();
                             // 计算时间间隔（毫秒）
@@ -242,14 +297,14 @@
         })
     
 
-    function generateGrid(response) {
+    function generateGrid(divname,response) {
         var model = generateModel(response);
         var columns = generateColumns(response);
         var myDate = new Date();
         var ls_date = myDate.getMinutes().toString()+myDate.getSeconds().toString();
 
-        $("#result").empty();
-        var grid = $("#result").kendoGrid({
+        $("#"+divname).empty();
+        var grid = $("#"+divname).kendoGrid({
           toolbar:["excel"],
           excel: {
                 fileName: 'result'+ls_date+".xlsx",
@@ -268,12 +323,13 @@
               model: model
             }
           },
+          selectable: "row", // 只能选择整行
           columns: columns,
-        //   pageable: {pageSize: gridpagesize},
           pageable: {pageSize: 10},
           editable:false,
           sortable: true,
           resizable: true,
+          filterable: true,
         });
       }
 

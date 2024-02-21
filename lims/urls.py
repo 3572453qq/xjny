@@ -2,6 +2,7 @@
 from django.contrib import admin
 from django.urls import path
 from . import views
+from . import cycleprocess
 urlpatterns = [
     path('', views.base, name='base'),
     path('vkeepexcel', views.vkeepexcel,name='vkeepexcel'),
@@ -14,4 +15,6 @@ urlpatterns = [
     path('crate', views.crate,name='crate'),
     path('querycycle', views.querycycle,name='querycycle'),
     path('getcycledata', views.getcycledata,name='getcycledata'),
+    path('cyclesummary', cycleprocess.cyclesummary,name='cyclesummary'),
+    path('handlecyclesummary', cycleprocess.handlecyclesummary,name='handlecyclesummary'),
 ]
