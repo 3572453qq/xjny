@@ -1,0 +1,27 @@
+{% extends 'lims/base_ui.html' %}
+{% block title %}查询循环数据{% endblock %}
+{% block content %}
+<div class='row-fluid' id="app">
+    
+    <img id="image"  src="" alt="Image">
+    </br>
+    <!-- <input id="quit" type="button" value="退出"> -->
+</div>
+
+<script>
+     //initiate the date picker widges
+     $(document).ready(function() {
+         // 设置图片"
+         var img = "{{ img | safe }}"
+         var base64ImageData = "data:image/jpeg;base64,"+img
+                           
+        document.getElementById("image").src = base64ImageData     
+                
+    });    
+    // $("#quit").kendoButton({
+    //         click: function () {
+    //             window.close();
+    //         }
+    // })
+</script>
+{% endblock %}

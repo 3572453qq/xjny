@@ -21,12 +21,14 @@ import multiprocessing
 from lims.models import *
 import numpy as np
 from sqlalchemy import create_engine
-import redis
+import redis,uuid
 import matplotlib.pyplot as plt
 import matplotlib
 from matplotlib.font_manager import FontProperties
 import io
 from django.http import HttpResponse
+import seaborn as sns
+
 
 # 指定字体文件的路径
 font_path = '/usr/share/fonts/Microsoft-Yahei.ttf'
@@ -282,9 +284,21 @@ def handlecyclesummary(request):
     
     print('after 画图')
 
+    # 将result_detail存入redis
+    r = redis.Redis(host='127.0.0.1', port=6379, db=0)
+    # 生成随机的 key
+    key = str(uuid.uuid4())
+    # 存储数据
+    for idx, adf in enumerate(detail_df):
+        akey = f'{key}_{idx}'  # 使用递增的键名
+        df_json = adf.to_json(orient='records')  # 将 DataFrame 转换为 JSON 字符串
+        r.set(akey, df_json)  # 存储 JSON 字符串
+        print(akey)
+    print(key)
     # 注意这里reesultdatalist是数组
     ls_data = {'summarydata': summary_response, 
                'resultdatalist': result_details,
+               'rediskey':key,
                 "isok": is_ok}
 
     # print(ls_data)
@@ -298,3 +312,66 @@ def cyclesummary(request):
     all_teams = list(teams.objects.values())
     context_dict['teams']=all_teams
     return render(request,'lims/cyclesummary.html',context_dict) 
+
+def cycledetail(request):
+    rediskey = request.GET.get('key')
+    detailno = request.GET.get('xuhao')
+    
+
+    context_dict = {'module': 'lims'}
+
+    
+    r = redis.Redis(host='localhost', port=6379, db=0,decode_responses=True)
+    key = f'{rediskey}_{detailno}'
+    print(key)
+
+    # 从 Redis 中获取 JSON 字符串
+    df_json = r.get(key)
+    # print(df_json)
+
+    # 将 JSON 字符串转换为 DataFrame
+    if df_json:
+        df = pd.read_json(df_json, orient='records')
+        df = df.sort_values(by=['computer_name','dev_unit_chl','test_id','cycle_id'])
+        # 画图
+        plt.clf()  # 清空当前图形绘制区域    
+        
+
+        print(df['cycle_id'])
+
+      
+
+        # 使用Seaborn绘制双 y 轴图
+        plt.figure(figsize=(10, 6))
+        ax1 = sns.lineplot(x='cycle_id', y='保持率', data=df, marker='o', color='blue', label='保持率')
+        ax2 = ax1.twinx()
+        sns.lineplot(x='cycle_id', y='库伦效率', data=df, marker='s', color='red', ax=ax2, label='库伦效率')
+
+        # 添加图例
+        lines, labels = ax1.get_legend_handles_labels()
+        lines2, labels2 = ax2.get_legend_handles_labels()
+        ax2.legend(lines + lines2, labels + labels2, loc='upper right', prop=font)
+
+        # 设置标题和标签
+        plt.title(df.iloc[0]['dev_unit_chl'],fontproperties=font)
+        ax1.set_ylabel('保持率', fontproperties=font)
+        ax2.set_ylabel('库伦效率', fontproperties=font)
+        ax1.set_xlabel('循环圈数', fontproperties=font)
+        ax2.set_xlabel('循环圈数', fontproperties=font)
+        plt.xlabel('循环圈数', fontproperties=font)
+
+
+
+
+        
+
+        # 将图形保存为图像文件
+        buffer = io.BytesIO()
+        plt.savefig(buffer, format='jpg')
+        buffer.seek(0)
+        img=base64.b64encode(buffer.getvalue()).decode()
+        # 清空缓冲区
+        buffer.truncate(0)
+    context_dict['img']=img
+    
+    return render(request,'lims/cycledetail.html',context_dict) 

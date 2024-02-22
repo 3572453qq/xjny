@@ -52,6 +52,7 @@
     </div>
     <button type='button' class='btn btn-primary' id="getdata">获取数据</button>
     <div id="result"> </div>
+    <div id="alertresult"> </div>
     <img id="image"  src="" alt="Image">
     <div id="imagecontainer"></div>
     <div id="resultdetail"> </div>
@@ -64,6 +65,15 @@
 </div>
 
 <script>
+  // 添加参数到表单的函数
+    function addInput(form, name, value) {
+            var input = document.createElement("input");
+            input.setAttribute("type", "hidden");
+            input.setAttribute("name", name);
+            input.setAttribute("value", value);
+            form.appendChild(input);
+        }
+
     function getSelectedOption() {
             var selectedOption = "";
             var radioButtons = document.getElementsByName("options");
@@ -75,6 +85,19 @@
             }
 
             return selectedOption
+      }
+
+      function destroyOldGrid() {
+          var oldGridElement = $("#result");
+          var oldGrid = oldGridElement.data("kendoGrid");
+          
+          if (oldGrid) {
+              oldGrid.destroy();
+              $('#result').off('dblclick');
+              $('#result').off('change');
+              
+          }
+          oldGridElement.empty(); // 清空 grid 元素及其子元素
       }
 
      //initiate the date picker widges
@@ -175,7 +198,7 @@
             value: 2,
             format: "n0"
           }
-        );fs
+        );
                 
     });
     
@@ -193,6 +216,7 @@
                 button_id = event.target.id
 
                 this.enable(false);
+                destroyOldGrid()
                 // alert($("#datepickerstart").data("kendoDatePicker").value())
                 // alert($("#datepickerend").data("kendoDatePicker").value())
 
@@ -213,8 +237,8 @@
                 var fs = $("#fs").data("kendoNumericTextBox").value();
                 var bs  = $("#bs").data("kendoNumericTextBox").value();
 
-                $("#result").empty();
-                $("#result").html('正在执行，等待加载结果，通常需要1-3分钟以上，请耐心等候。。。')
+                $("#alertresult").empty();
+                $("#alertresult").html('正在执行，等待加载结果，通常需要1-3分钟以上，请耐心等候。。。')
                 $("#resultdetail").empty();
                 
                 document.getElementById("image").src = "";
@@ -235,15 +259,16 @@
                     },
                     dataType: "json",
                     success: function (result) {
+                        destroyOldGrid()
                       // alert('here recieved')
                         if(result['isok']==0)
                         {
                             alert(result['errmsg'])
-                            $("#result").html('执行失败，错误原因是：'+result['errmsg'])
+                            $("#alertresult").html('执行失败，错误原因是：'+result['errmsg'])
                         }
                         else if(result['isok']==2)  
                         {
-                          $("#result").html('执行成功：'+result['errmsg'])
+                          $("#alertresult").html('执行成功：'+result['errmsg'])
                           var downloadLink = document.createElement('a');
                           downloadLink.href = 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,' + result.file_data;
                           downloadLink.download = result.file_name;
@@ -269,14 +294,21 @@
                               // var base64ImageData = ""
                               document.getElementById("image").src = "";
                               document.getElementById("image").src = base64ImageData;
-                              // 创建一个 <img> 元素
-                              // var imgElement = document.createElement("img");
-                              // imgElement.src = base64ImageData;
-                              // var imageContainer = document.getElementById("imagecontainer");
-                              // imageContainer.appendChild(imgElement);
-                              generateGrid('resultdetail',result['resultdatalist'][columnAValue]);
-                              
+                              generateGrid('resultdetail',result['resultdatalist'][columnAValue]);                              
                          
+                          });
+                          $('#result').dblclick(function () {
+                              // 定义 rediskey 变量
+                              var rediskey = result['rediskey'];
+                              var selectedRows = dataItem = $("#result").data("kendoGrid").select();                              
+                              var dataItem = $("#result").data("kendoGrid").dataItem(selectedRows.first());
+                              var xuhao = dataItem.get("序号");
+
+                              // 构建URL
+                              var url = "/lims/cycledetail?key=" + encodeURIComponent(rediskey) + "&xuhao=" + encodeURIComponent(xuhao);
+
+                              // 使用window.open打开新窗口
+                              window.open(url, "_blank");             
                           });
                         }
                         var endTime = new Date();
