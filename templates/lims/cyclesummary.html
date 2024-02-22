@@ -238,7 +238,7 @@
                 var bs  = $("#bs").data("kendoNumericTextBox").value();
 
                 $("#alertresult").empty();
-                $("#alertresult").html('正在执行，等待加载结果，通常需要1-3分钟以上，请耐心等候。。。')
+                $("#alertresult").html('正在执行，等待加载结果，通常需要1-3分钟，请耐心等候。。。')
                 $("#resultdetail").empty();
                 
                 document.getElementById("image").src = "";
@@ -276,6 +276,7 @@
                         }                       
                         else
                         { 
+                          $("#alertresult").html('加载完成')
                             generateGrid('result',result['summarydata']);
                             // 设置图片
                             var base64ImageData = "data:image/jpeg;base64,"+result['resultdatalist'][0]['img']
