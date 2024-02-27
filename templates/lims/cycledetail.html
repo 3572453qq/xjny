@@ -7,6 +7,7 @@
     </br>
     <!-- <input id="quit" type="button" value="退出"> -->
 </div>
+<div id="resultdetail"> </div>
 
 <script>
      //initiate the date picker widges
@@ -15,13 +16,98 @@
          var img = "{{ img | safe }}"
          var base64ImageData = "data:image/jpeg;base64,"+img
                            
-        document.getElementById("image").src = base64ImageData     
+        document.getElementById("image").src = base64ImageData    
+        var response = {{ response | safe }}
+        generateGrid('resultdetail',response);  
                 
     });    
-    // $("#quit").kendoButton({
-    //         click: function () {
-    //             window.close();
-    //         }
-    // })
+   
+    var isDateField =[];
+    function generateGrid(divname,response) {
+        var model = generateModel(response);
+        var columns = generateColumns(response);
+        var myDate = new Date();
+        var ls_date = myDate.getMinutes().toString()+myDate.getSeconds().toString();
+
+        $("#"+divname).empty();
+        var grid = $("#"+divname).kendoGrid({
+          toolbar:["excel"],
+          excel: {
+                fileName: 'result'+ls_date+".xlsx",
+                proxyURL: "https://demos.telerik.com/kendo-ui/service/export",
+                filterable: true,
+                allPages: true
+            },
+          dataSource: {
+            transport:{
+              read:  function(options){
+                options.success(response.data);
+              }
+            },
+
+            schema: {
+              model: model
+            }
+          },
+          selectable: "row", // 只能选择整行
+          columns: columns,
+          pageable: {pageSize: 10},
+          editable:false,
+          sortable: true,
+          resizable: true,
+          filterable: true,
+        });
+      }
+
+      function generateColumns(response){
+        var columnNames = response["columns"];
+        return columnNames.map(function(name){
+          return { field: name, format: (isDateField[name] ? "{0:D}" : ""), width: 150};
+        })
+      }
+
+      function generateModel(response) {
+        var sampleDataItem = response["data"][0];
+
+        var model = {};
+        var fields = {};
+        for (var property in sampleDataItem) {
+          if(property.indexOf("ID") !== -1){
+            model["id"] = property;
+          }
+          var propType = typeof sampleDataItem[property];
+
+          if (propType === "number" ) {
+            fields[property] = {
+              type: "number",
+              validation: {
+                required: true
+              }
+            };
+            if(model.id === property){
+              fields[property].editable = false;
+              fields[property].validation.required = false;
+            }
+          } else if (propType === "boolean") {
+            fields[property] = {
+              type: "boolean"
+            };
+          } else if (propType === "string") {
+            fields[property] = {
+              type: "string"
+            };
+          } else {
+            fields[property] = {
+              validation: {
+                required: true
+              }
+            };
+          }
+        }
+
+        model.fields = fields;
+
+        return model;
+      }
 </script>
 {% endblock %}

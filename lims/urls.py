@@ -18,4 +18,6 @@ urlpatterns = [
     path('cyclesummary', cycleprocess.cyclesummary,name='cyclesummary'),
     path('handlecyclesummary', cycleprocess.handlecyclesummary,name='handlecyclesummary'),
     path('cycledetail', cycleprocess.cycledetail,name='cycledetail'),
+    path('cyclebybarcode', cycleprocess.cyclebybarcode,name='cyclebybarcode'),
+    path('handlecyclebarcode', cycleprocess.handlecyclebarcode,name='handlecyclebarcode'),
 ]

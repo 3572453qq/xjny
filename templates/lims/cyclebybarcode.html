@@ -1,7 +1,19 @@
 {% extends 'lims/base_ui.html' %}
-{% block title %}查询循环数据{% endblock %}
+{% block title %}查询特定循环数据{% endblock %}
 {% block content %}
 <style>
+  .transparent-container {
+    background-color: rgba(255, 255, 255, 0.5); /* 使用 rgba() 函数设置背景颜色和透明度 */
+    border-radius: 5px; /* 设置圆角 */
+    padding: 10px; /* 设置内边距 */
+  }
+  /* 标题样式 */
+.container-title {
+    font-size: 18px; /* 设置字体大小 */
+    font-weight: bold; /* 设置字体加粗 */
+    margin-bottom: 10px; /* 设置下边距 */
+}
+
   .radio-container {
       margin-bottom: 10px;
   }
@@ -9,14 +21,17 @@
   .radio-container label {
       margin-right: 10px;
   }
+
+  .k-numeric-wrap {
+            margin-right: 5px; /* 设置右侧外边距为 5px */
+        }
   .k-datepicker {
             width: 130px; /* 设置 DatePicker 的宽度 */
         }
-  .k-dropdown-wrap {
-      width: 100px; /* 设置 DatePicker 的宽度 */
-  }
+
   .k-numeric-wrap {
           width: 60px; /* 设置 NumericTextBox 的宽度 */
+          margin-right: 100px;
       }
   #option1,#option2 {
             display: none; /* 设置 display 属性为 none，隐藏元素 */
@@ -24,33 +39,52 @@
   .k-grid {
             font-size: 12px !important;
         }
-
+  
 </style>
 
 <div class='row-fluid' id="app">
-
+  <div class="transparent-container">
+    <!-- 标题 -->
+    <div class="container-title">搜索条件</div>
     <div class="radio-container d-inline-block">
+      <label for="datepickerstart">开始日期：</label>
       <input id="datepickerstart" />
+      <label for="datepickerend">结束日期：</label>
       <input id="datepickerend" />
+      <label for="barcode">条码：</label>
+      <input id="barcode" />
+      <label for="basecycle">保持率计算基准循环:</label>
+      <input id="basecycle" style="width: 100px;"/>
+      
+
       <input type="radio" id="option1" name="options" value="uat" checked>
-      <!-- <label for="option1">测试中心</label> -->
       <input type="radio" id="option2" name="options" value="yanfa">
-      <!-- <label for="option2">研发中心</label> -->
       <input id="kd-place-chooser" />
-
-
-      <label for="numeric1">循环:</label>
-      <input id="numeric1" class="k-numerictextbox" style="width: 100px;" />
-      <label for="numeric2">次后，保持率高于:</label>
-      <input id="numeric2" class="k-numerictextbox" style="width: 100px;" />
-
-      <label for="fs">向前搜索:</label>
-      <input id="fs" class="k-numerictextbox" style="width: 100px;" />
-      <label for="bs">向后搜索:</label>
-      <input id="bs" class="k-numerictextbox" style="width: 100px;" />
-            
+      <button type='button' class='btn btn-primary' id="getdata">获取数据</button>
     </div>
-    <button type='button' class='btn btn-primary' id="getdata">获取数据</button>
+  </div>
+  
+  <div class="transparent-container">
+    <!-- 标题 -->
+    <div class="container-title">作图设置</div>
+    <div class="radio-container d-inline-block">
+      <label for="crate">倍率:</label>
+      <input id="crate" style="width: 100px;" />
+      <label for="keeplow">保持率坐标低值:</label>
+      <input id="keeplow" style="width: 100px;"/>
+      <label for="keephigh">保持率坐标高值:</label>
+      <input id="keephigh" style="width: 100px;"/>
+      <label for="kulunplow">库伦效率坐标低值:</label>
+      <input id="kulunlow" style="width: 100px;"/>
+      <label for="kulunhigh">库伦效率坐标高值:</label>
+      <input id="kulunhigh" style="width: 100px;"/>
+      <label for="cyclecount">循环截止次数</label>
+      <input id="cyclecount" class="k-numerictextbox" style="width: 100px;" />
+    </div>
+  </div>
+
+    
+
     <div id="result"> </div>
     <div id="alertresult"> </div>
     <img id="image"  src="" alt="Image">
@@ -65,15 +99,6 @@
 </div>
 
 <script>
-  // 添加参数到表单的函数
-    function addInput(form, name, value) {
-            var input = document.createElement("input");
-            input.setAttribute("type", "hidden");
-            input.setAttribute("name", name);
-            input.setAttribute("value", value);
-            form.appendChild(input);
-        }
-
     function getSelectedOption() {
             var selectedOption = "";
             var radioButtons = document.getElementsByName("options");
@@ -99,48 +124,36 @@
           }
           oldGridElement.empty(); // 清空 grid 元素及其子元素
       }
-
-     //initiate the date picker widges
-     $(document).ready(function() {
       function isdateok() {
           
           var startDate = $("#datepickerstart").data("kendoDatePicker").value();
           var endDate = $("#datepickerend").data("kendoDatePicker").value();
           var differenceInDays = (endDate - startDate) / (1000 * 60 * 60 * 24);
-
           if (differenceInDays < 0)
           {
-            alert('结束日期不能小于开始日期')
+            alert('结束日期小于开始日期')
             return 
           }
-          if (differenceInDays > 3 && differenceInDays<=5) {
-              alert("您选择的日期范围超过了3天，可能会导致数据选取缓慢，请注意!");
-          }
-          if (differenceInDays > 5) {
-            alert("选择的日期范围不能超过5天，请注意!");
-            var maxEndDate = new Date(startDate);
-            maxEndDate.setDate(startDate.getDate() + 5);            
-            $("#datepickerstart").data("kendoDatePicker").value(startDate)
-            $("#datepickerend").data("kendoDatePicker").value(maxEndDate)
-          }
-          
         }
-        var start = new Date();
-        var end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 2);
+
+     //initiate the date picker widges
+     $(document).ready(function() {
+        var end = new Date()
+        var start = new Date(end.getFullYear(), end.getMonth(), end.getDate() - 60);
         $("#datepickerstart").kendoDatePicker({
             culture: "zh-CN", 
             format: "yyyyMMdd", 
             value:start,
             dateInput: true,
-            change: isdateok
-        });
+            change: isdateok,
+        });     
         $("#datepickerend").kendoDatePicker({
             culture: "zh-CN", 
             format: "yyyyMMdd", 
             value:end,
             dateInput: true,
             change: isdateok
-        });
+        });    
         
         
 
@@ -174,28 +187,58 @@
                 }
         });
 
-        $("#numeric1").kendoNumericTextBox(
+        $("#barcode").kendoTextBox({
+            placeholder: "多个条码用英文逗号分开"
+        });
+
+        $("#cyclecount").kendoNumericTextBox(
           {
-            value: 10,
+            value: 10000,
             format: "n0"
           }
         );
-        $("#numeric2").kendoNumericTextBox(
+        $("#crate").kendoNumericTextBox(
           {
-            value: 80,
-            format: "n0"
+            value: 0.3,
+            format: "n2"
           }
         );
 
-        $("#fs").kendoNumericTextBox(
+        $("#keeplow").kendoNumericTextBox(
           {
-            value: 2,
-            format: "n0"
+            value: 0.8,
+            min: 0, // 最小值为0
+            max: 3, // 最大值为3
+            format: "n2"
           }
         );
-        $("#bs").kendoNumericTextBox(
+        $("#keephigh").kendoNumericTextBox(
           {
-            value: 2,
+            value: 1.2,
+            min: 0, // 最小值为0
+            max: 3, // 最大值为3
+            format: "n2"
+          }
+        );
+        $("#kulunlow").kendoNumericTextBox(
+          {
+            value: 0.8,
+            min: 0, // 最小值为0
+            max: 3, // 最大值为3
+            format: "n2"
+          }
+        );
+        $("#kulunhigh").kendoNumericTextBox(
+          {
+            value: 1.2,
+            min: 0, // 最小值为0
+            max: 3, // 最大值为3
+            format: "n2"
+          }
+        );
+        $("#basecycle").kendoNumericTextBox(
+          {
+            value: 4,
             format: "n0"
           }
         );
@@ -231,11 +274,16 @@
                 var teamid = $("#kd-place-chooser").val()
                 // alert(team)
 
-                var cyclecount = $("#numeric1").data("kendoNumericTextBox").value();
-                var chgefficiency  = $("#numeric2").data("kendoNumericTextBox").value();
+                var cyclecount = $("#cyclecount").data("kendoNumericTextBox").value();
+                var barcode=$("#barcode").data("kendoTextBox").value();
+                var crate = $("#crate").data("kendoNumericTextBox").value();
 
-                var fs = $("#fs").data("kendoNumericTextBox").value();
-                var bs  = $("#bs").data("kendoNumericTextBox").value();
+                var keeplow = $("#keeplow").data("kendoNumericTextBox").value();
+                var keephigh = $("#keephigh").data("kendoNumericTextBox").value();
+                var kulunlow = $("#kulunlow").data("kendoNumericTextBox").value();
+                var kulunhigh = $("#kulunhigh").data("kendoNumericTextBox").value();
+
+                var basecycle = $("#basecycle").data("kendoNumericTextBox").value();
 
                 $("#alertresult").empty();
                 $("#alertresult").html('正在执行，等待加载结果，通常需要1-3分钟，请耐心等候。。。')
@@ -246,16 +294,20 @@
                 $.ajax({
                     // async: false,
                     type: 'POST',
-                    url: '/lims/handlecyclesummary',
+                    url: '/lims/handlecyclebarcode',
                     data: {
                         'startdate': startdate,
                         'enddate':enddate,
+                        'barcode':barcode,
                         'dbname': dbname,
                         'teamid': teamid,
                         'cyclecount':cyclecount,
-                        'chgefficiency':chgefficiency,
-                        'fs':fs,
-                        'bs':bs
+                        'crate':crate,
+                        'keeplow':keeplow,
+                        'keephigh':keephigh,
+                        'kulunlow':kulunlow,
+                        'kulunhigh':kulunhigh,
+                        'basecycle':basecycle,
                     },
                     dataType: "json",
                     success: function (result) {
@@ -304,12 +356,23 @@
                               var selectedRows = dataItem = $("#result").data("kendoGrid").select();                              
                               var dataItem = $("#result").data("kendoGrid").dataItem(selectedRows.first());
                               var xuhao = dataItem.get("序号");
+                              var cyclecount = $("#cyclecount").data("kendoNumericTextBox").value();
+                              var barcode=$("#barcode").data("kendoTextBox").value();
+                              var crate = $("#crate").data("kendoNumericTextBox").value();
+
+                              var keeplow = $("#keeplow").data("kendoNumericTextBox").value();
+                              var keephigh = $("#keephigh").data("kendoNumericTextBox").value();
+                              var kulunlow = $("#kulunlow").data("kendoNumericTextBox").value();
+                              var kulunhigh = $("#kulunhigh").data("kendoNumericTextBox").value();
+
+                              var basecycle = $("#basecycle").data("kendoNumericTextBox").value();
 
                               // 构建URL
                               var url = "/lims/cycledetail?key=" + encodeURIComponent(rediskey) + "&xuhao=" + encodeURIComponent(xuhao)
-                                        +'&db='+encodeURIComponent(dbname)+'&sd='+encodeURIComponent(startdate)
-                                        +'&tp='+'summary'
-
+                                        +'&cr='+encodeURIComponent(crate)+'&pl='+encodeURIComponent(keeplow)+'&ph='+encodeURIComponent(keephigh)
+                                        +'&bc='+encodeURIComponent(basecycle)+'&kl='+encodeURIComponent(kulunlow)+'&kh='+encodeURIComponent(kulunhigh)
+                                        +'&cc='+encodeURIComponent(cyclecount)  +'&sd='+encodeURIComponent(startdate)
+                                        +'&db='+encodeURIComponent(dbname) +'&tp='+'barcode'
                               // 使用window.open打开新窗口
                               window.open(url, "_blank");             
                           });
