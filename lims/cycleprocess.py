@@ -355,7 +355,7 @@ def cycledetail(request):
         end_table='cycle'+enddate
         print('starttable',start_table,'endtable',end_table)
         df = runsqlovertables(start_table,end_table,unique_values_combined,db_name,'cycle_id')
-
+        df = df.sort_values(by=['computer_name','dev_unit_chl','test_id','cycle_id'])
         if len(df)>basecycle:
             df['保持率'] = (df['discharge_capacity'] / df['discharge_capacity'].iloc[basecycle-1] ).round(4)
             df['库伦效率'] = (df['discharge_capacity'] / df['charge_capacity'] ).round(4)
