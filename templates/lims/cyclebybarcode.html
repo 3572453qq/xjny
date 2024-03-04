@@ -276,6 +276,11 @@
 
                 var cyclecount = $("#cyclecount").data("kendoNumericTextBox").value();
                 var barcode=$("#barcode").data("kendoTextBox").value();
+                if (barcode === '') { // 判断字符串是否为空
+                    alert('barccode不能为空')
+                    this.enable(true);
+                    return; // 若为空，直接返回     
+                }
                 var crate = $("#crate").data("kendoNumericTextBox").value();
 
                 var keeplow = $("#keeplow").data("kendoNumericTextBox").value();

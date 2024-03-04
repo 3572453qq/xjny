@@ -308,7 +308,7 @@ def handlecyclesummary(request):
     # return HttpResponse(ls_data)
 
     
-@login_required
+@login_required(login_url='/admin/login/')
 def cyclesummary(request):
     context_dict = {'module': 'lims'}
     user_all_permissions = request.user.get_all_permissions()
@@ -428,7 +428,7 @@ def cycledetail(request):
     return render(request,'lims/cycledetail.html',context_dict) 
 
 
-@login_required
+@login_required(login_url='/admin/login/')
 def cyclebybarcode(request):
     context_dict = {'module': 'lims'}
     
