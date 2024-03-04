@@ -26,7 +26,7 @@ AUTH_LDAP_BIND_PASSWORD = 'xinshijie@2023'  # 替换为你的绑定密码
 AUTH_LDAP_USER_SEARCH = LDAPSearch(
     "OU=inx,DC=xworld,DC=com", ldap.SCOPE_SUBTREE, "(samAccountName=%(user)s)")
 AUTH_LDAP_ALWAYS_UPDATE_USER = True
-
+ 
 AUTHENTICATION_BACKENDS = [
     'django_auth_ldap.backend.LDAPBackend',
     'django.contrib.auth.backends.ModelBackend',
