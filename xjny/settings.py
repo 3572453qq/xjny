@@ -17,7 +17,9 @@ import os
 from django_auth_ldap.config import LDAPSearch
 # settings.py
 
-
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_AGE = 60*20  # 30分钟
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 AUTH_LDAP_SERVER_URI = 'ldap://172.28.1.254'  # 替换为你的AD服务器地址
 AUTH_LDAP_AUTHORIZE_ALL_USERS = True

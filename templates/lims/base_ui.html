@@ -3,6 +3,10 @@
 {% get_current_language_bidi as LANGUAGE_BIDI %}
 {% get_direction as direction %}
 {% get_admin_setting as admin_setting %}
+{% load commontags %}
+{% current_time "%Y-%m-%d %I:%M %p" as the_time %}
+{% expire_seconds as expire_seconds %}
+
 
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}">
@@ -10,7 +14,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>
-      XJNY  - {% block title %}{% endblock %}
+      XJNY  - {% block title %}{% endblock %}      
     </title>
 
     <!-- Favicon -->
@@ -76,8 +80,10 @@
 
     page_load_time = new Date().getTime();
     active_seconds = (new Date().getTime() - page_load_time) / 1000;
-    // alert(active_seconds)
-    if (active_seconds >= 30) {
+
+    session_timeout = {{ expire_seconds }};
+
+    if (active_seconds >= session_timeout) {
         alert('会话超时，将重新登录')
         window.location = '/lims/index';
     }}

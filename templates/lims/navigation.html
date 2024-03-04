@@ -21,6 +21,7 @@
 
         {% if request.user.is_authenticated %}
           <li class="nav-item d-flex align-items-center">
+          <span>欢迎 {{ request.user.username }}</span>
 
             {% if request.user.is_superuser %}
             <a href="{% url 'admin:logout' %}" class="nav-link text-body font-weight-bold px-0">
