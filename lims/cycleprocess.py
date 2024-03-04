@@ -1,5 +1,6 @@
 from django.shortcuts import render
 import random,string
+from django.contrib.auth.decorators import login_required, permission_required
 import pandas as pd
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -307,10 +308,13 @@ def handlecyclesummary(request):
     # return HttpResponse(ls_data)
 
     
-
+@login_required
 def cyclesummary(request):
     context_dict = {'module': 'lims'}
-    all_teams = list(teams.objects.values())
+    user_all_permissions = request.user.get_all_permissions()
+    all_teams = list(teams.objects.filter(
+        teampriv__in=user_all_permissions).values())
+
     context_dict['teams']=all_teams
     return render(request,'lims/cyclesummary.html',context_dict) 
 
@@ -424,10 +428,14 @@ def cycledetail(request):
     return render(request,'lims/cycledetail.html',context_dict) 
 
 
-
+@login_required
 def cyclebybarcode(request):
     context_dict = {'module': 'lims'}
-    all_teams = list(teams.objects.values())
+    
+    user_all_permissions = request.user.get_all_permissions()
+
+    all_teams = list(teams.objects.filter(
+        teampriv__in=user_all_permissions).values())
     context_dict['teams']=all_teams
     return render(request,'lims/cyclebybarcode.html',context_dict) 
 	
@@ -438,7 +446,7 @@ def handlecyclebarcode(request):
     # get all the inputs from client
     start_date = request.POST.get('startdate')
     end_date = request.POST.get('enddate')
-    barcode = request.POST.get('barcode').split(',')
+    barcode = request.POST.get('barcode').replace('，', ',').split(',')
     db_name = request.POST.get('dbname')
     team_id = request.POST.get('teamid')
     cyclecount = int(request.POST.get('cyclecount'))

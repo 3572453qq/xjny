@@ -22,6 +22,7 @@ import pymysql
 import multiprocessing
 from lims.models import *
 import numpy as np
+from django.contrib.auth.decorators import login_required, permission_required
 
 border_style = Border(left=Side(border_style='thin'),
                     right=Side(border_style='thin'),
