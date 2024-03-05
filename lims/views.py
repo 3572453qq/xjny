@@ -61,12 +61,46 @@ def base_test(request):
 def vkeepexcel(request):
     return render(request,'lims/vkeepexcel.html')
 
+def vhrjoindate(request):
+    return render(request,'lims/hrjoindate.html')
+
 def querycycle(request):
     context_dict = {'module': 'lims'}
     all_teams = list(teams.objects.values())
     context_dict['teams']=all_teams
     return render(request,'lims/querycycle.html',context_dict)
 
+def handlehrjoindate(request):
+    if request.method == 'POST' and request.FILES.getlist('files'):
+        afile = request.FILES.getlist('files')[0]
+    # 读取 Excel 文件并保存到数据库
+    try:
+        df = pd.read_excel(afile,skiprows=2)
+        df = df.dropna(how='all')
+        # 假设你已经有了一个名为 YourModel 的模型来表示数据库表格
+        # 将数据保存到数据库表中，这里假设你的模型有对应的字段与 Excel 表头对应
+       
+        insert_df = pd.DataFrame()
+        insert_df['name']=df['员工姓名']
+        insert_df['joindate']=df['入职日期']
+        insert_df['id'] = insert_df.index 
+        last_column = insert_df.pop(insert_df.columns[-1])  # 弹出最后一列
+        insert_df.insert(0, last_column.name, last_column)  # 将最后一列插入到第一列位置
+    
+        
+        print(insert_df)
+        hrjoindate.objects.all().delete()  # 全量更新，先清空表格
+        hrjoindate.objects.bulk_create(
+            hrjoindate(**row) for row in insert_df.to_dict(orient='records')
+        )
+        ls_columns = insert_df.columns.tolist()
+        result = insert_df.to_dict(orient='records')
+        return JsonResponse({'success': True,'data':result,'columns':ls_columns})
+    except Exception as e:
+        print('exception',e)
+        return JsonResponse({'success': False, 'error': str(e)})
+
+    
 def handlevkeep(request):
     if request.method == 'POST' and request.FILES.getlist('files'):
         response_data = []

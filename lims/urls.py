@@ -20,4 +20,6 @@ urlpatterns = [
     path('cycledetail', cycleprocess.cycledetail,name='cycledetail'),
     path('cyclebybarcode', cycleprocess.cyclebybarcode,name='cyclebybarcode'),
     path('handlecyclebarcode', cycleprocess.handlecyclebarcode,name='handlecyclebarcode'),
+    path('vhrjoindate', views.vhrjoindate,name='vhrjoindate'),
+    path('handlehrjoindate', views.handlehrjoindate,name='handlehrjoindate'),
 ]

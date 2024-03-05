@@ -1,0 +1,86 @@
+{% extends 'lims/base_ui.html' %}
+{% block title %}员工入职时间维护{% endblock %}
+{% block content %}
+
+<form method="post" style="width:500px">
+    <input name="files" id="fileUpload" type="file" />
+</form>
+<div id="gridContainer"></div>
+<div id="spreadsheet" style="width: 100%; height: 100vh;"></div>
+
+
+<script>
+    $('#fileUpload').kendoUpload(
+            {
+                multiple: false,
+                async: {
+                    'saveUrl': '/lims/handlehrjoindate',
+                    'autoUpload': false,
+                    'batch': true 
+                },
+                localization: {
+                    select: "导入文件进行处理",
+                    uploadSelectedFiles: "确定导入",
+                    uploadSuccess: "导入成功",
+                    statusUploaded: "导入完成",
+                    statusUploading:"导入中",
+                    dropFilesHere: "将文件拖到此处导入",
+                    headerStatusUploading:"处理中，请耐心等候",
+                    headerStatusUploaded:"导入完成",
+                },
+                validation: {
+                    allowedExtensions: ['CSV', 'XLS', 'XLSX'],
+                },
+                success: function (e) {
+                    console.log(e.response.data)
+                    $('#gridContainer').empty()
+                    generateGrid('gridContainer',e.response.data,e.response.columns)
+                    alert('更新完毕，请检查更新结果！')                   
+
+                },
+                select: cleartable,
+                complete: function (e) {
+                  this.clearAllFiles();
+                  console.log('complete event.');
+                  console.log(e)
+                
+                                    
+                },
+            }
+      ); 
+      function cleartable(e){
+        // alert('hhe')
+        var spreadsheet = $("#spreadsheet").data("kendoSpreadsheet");
+        if (spreadsheet) {
+        // 刷新电子表格以更新显示
+        spreadsheet.activeSheet().range(1,1,1000,1000).value('')
+        spreadsheet.refresh();
+        } 
+      }
+      function generateGrid(gridId,data,columns)
+      {
+
+
+        $("#" + gridId).kendoGrid({
+            dataSource: {
+                data: data,
+            },
+            height: 550,
+            sortable: true,
+            columns: columns,
+            resizable: true,
+            pageable: {pageSize: 10},
+            editable:false, 
+            filterable: true,
+        });
+        }
+      
+     
+
+
+
+
+
+</script>
+
+{% endblock %}

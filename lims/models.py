@@ -16,6 +16,13 @@ class teamcomputer(models.Model):
     computer_name =  models.CharField(
         max_length=64, verbose_name='计算机名称', null=False, blank=True)
 
+class hrjoindate(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(
+        max_length=64, verbose_name='姓名', null=False, blank=True)
+    joindate =  models.CharField(
+        max_length=64, verbose_name='日期', null=False, blank=True)
+
 class pagepermission(models.Model):
     class Meta:
         permissions = (("uatdata", "Can view uat data"), ("yanfa1", "Can view yanfa1 data"),
