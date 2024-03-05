@@ -23,11 +23,18 @@ import multiprocessing
 from lims.models import *
 import numpy as np
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth import logout
+from django.shortcuts import redirect
 
 border_style = Border(left=Side(border_style='thin'),
                     right=Side(border_style='thin'),
                     top=Side(border_style='thin'),
                     bottom=Side(border_style='thin'))
+
+def mylogout(request):
+    print('hello in mylogout')
+    logout(request)
+    return redirect('/lims/index')  # 重定向到 /lims/index 页面
 
 def copy_excel_to_tmp(src_file_path):
     # 获取原始文件名和扩展名
@@ -63,6 +70,9 @@ def vkeepexcel(request):
 
 def vhrjoindate(request):
     return render(request,'lims/hrjoindate.html')
+
+def index(request):
+    return render(request,'lims/index.html')
 
 def querycycle(request):
     context_dict = {'module': 'lims'}
@@ -637,3 +647,28 @@ def getcycledata(request):
         #     json.dump(ls_data, f)
 
         return JsonResponse(ls_data)
+
+
+def get_function_tree(request):
+    user_all_permissions = request.user.get_all_permissions()
+    # 从数据库中获取功能数据
+    # functions = appfunction.objects.filter(
+    #     priv__in=user_all_permissions).values('id', 'name', 'link', 'priv', 'parentid')
+    functions = appfunction.objects.all().values('id', 'name', 'link', 'priv', 'parentid')
+    print('functions:',functions)
+    # 将功能数据转换为树形结构
+    def build_tree(items, parentid=None):
+        tree = []
+        for item in items:
+            if item['parentid'] == parentid:
+                children = build_tree(items, item['id'])
+                if children:
+                    item['items'] = children
+                tree.append(item)
+        return tree
+
+    function_tree = build_tree(list(functions),0)
+    print(function_tree)
+
+    # 返回 JSON 格式的功能树数据
+    return JsonResponse(function_tree, safe=False)

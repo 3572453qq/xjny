@@ -49,7 +49,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+LOGIN_URL = '/lims/index'
 
+LOGIN_REDIRECT_URL = '/lims/index'
 # Application definition
 
 INSTALLED_APPS = [

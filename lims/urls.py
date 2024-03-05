@@ -4,7 +4,7 @@ from django.urls import path
 from . import views
 from . import cycleprocess
 urlpatterns = [
-    path('', views.base, name='base'),
+    path('', views.index, name='index'),
     path('vkeepexcel', views.vkeepexcel,name='vkeepexcel'),
     path('handlevkeep', views.handlevkeep,name='handlevkeep'),
     # path('cyclesort', views.cyclesort,name='cyclesort'),
@@ -22,4 +22,6 @@ urlpatterns = [
     path('handlecyclebarcode', cycleprocess.handlecyclebarcode,name='handlecyclebarcode'),
     path('vhrjoindate', views.vhrjoindate,name='vhrjoindate'),
     path('handlehrjoindate', views.handlehrjoindate,name='handlehrjoindate'),
+    path('get_function_tree', views.get_function_tree,name='get_function_tree'), 
+    path('index', views.index,name='index'), 
 ]
