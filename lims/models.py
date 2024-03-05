@@ -28,7 +28,9 @@ class pagepermission(models.Model):
         permissions = (("uatdata", "Can view uat data"), ("yanfa1", "Can view yanfa1 data"),
                        ("yanfa2", "Can view yanfa2 data"),("yanfa3", "Can view yanfa3 data"),
                        ("cycleexcel", "Can handle cycleexcel"),("labfunction", "Can view lab function"),
-                       ("crateexcel", "Can handle crateexcel"),
+                       ("crateexcel", "Can handle crateexcel"),("cyclebybarcode", "Can search by barcode"),
+                       ("cyclesummary", "Can search summary"),("hrfunction", "Can view hr function"),
+                       ("joindate", "Can maintain joindate"),
         )
 
 class appfunction(models.Model):

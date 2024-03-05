@@ -651,11 +651,12 @@ def getcycledata(request):
 
 def get_function_tree(request):
     user_all_permissions = request.user.get_all_permissions()
+    # print('user all permissions',user_all_permissions)
     # 从数据库中获取功能数据
-    # functions = appfunction.objects.filter(
-    #     priv__in=user_all_permissions).values('id', 'name', 'link', 'priv', 'parentid')
-    functions = appfunction.objects.all().values('id', 'name', 'link', 'priv', 'parentid')
-    print('functions:',functions)
+    functions = appfunction.objects.filter(
+        priv__in=user_all_permissions).values('id', 'name', 'link', 'priv', 'parentid')
+    # functions = appfunction.objects.all().values('id', 'name', 'link', 'priv', 'parentid')
+    # print('functions:',functions)
     # 将功能数据转换为树形结构
     def build_tree(items, parentid=None):
         tree = []
@@ -668,7 +669,7 @@ def get_function_tree(request):
         return tree
 
     function_tree = build_tree(list(functions),0)
-    print(function_tree)
+    # print(function_tree)
 
     # 返回 JSON 格式的功能树数据
     return JsonResponse(function_tree, safe=False)
