@@ -347,18 +347,33 @@ def cycledetail(request):
     df_json = r.get(key)
 
     if df_json:
+        
         # 将 JSON 字符串转换为 DataFrame
         df = pd.read_json(df_json, orient='records')
         df = df.sort_values(by=['computer_name','dev_unit_chl','test_id','cycle_id'])
 
-        startdate = get_adjacent_date(startdate,FORWARDDAYS)
-        enddate = '20991231'
+        
+        if detail_type != ('redraw'):
+            # 不是redraw则取下更多结果并存入redis
+            startdate = get_adjacent_date(startdate,FORWARDDAYS)
+            enddate = '20991231'
+            unique_values_combined = df[['computer_name', 'dev_unit_chl','test_id']].drop_duplicates()
+            start_table='cycle'+startdate
+            end_table='cycle'+enddate
+            print('starttable',start_table,'endtable',end_table)
+            df = runsqlovertables(start_table,end_table,unique_values_combined,db_name,'cycle_id')
+            # 将result_detail存入redis
+            r = redis.Redis(host='127.0.0.1', port=6379, db=0)
+            # 生成随机的 key
+            solokey = str(uuid.uuid4())
+            # 存储数据
+            akey = f'{solokey}_1'  # 将本次结果单独存入redis
+            df_json = df.to_json(orient='records')  # 将 DataFrame 转换为 JSON 字符串
+            r.set(akey, df_json)  # 存储 JSON 字符串
+            print(akey)
+        else:
+            solokey=rediskey
 
-        unique_values_combined = df[['computer_name', 'dev_unit_chl','test_id']].drop_duplicates()
-        start_table='cycle'+startdate
-        end_table='cycle'+enddate
-        print('starttable',start_table,'endtable',end_table)
-        df = runsqlovertables(start_table,end_table,unique_values_combined,db_name,'cycle_id')
         df = df.sort_values(by=['computer_name','dev_unit_chl','test_id','cycle_id'])
         if len(df)>basecycle:
             df['保持率'] = (df['discharge_capacity'] / df['discharge_capacity'].iloc[basecycle-1] ).round(4)
@@ -389,6 +404,8 @@ def cycledetail(request):
         print('hello barcode',df.iloc[0]['barcode'])
         print(df.iloc[0]['dev_unit_chl'])
         print(crate)
+        if crate == -100:
+            crate == 1
         title = 'barcode:'+df.iloc[0]['barcode']+' 通道:'+df.iloc[0]['dev_unit_chl']+' 倍率:'+str(crate)
         plt.title(title,fontproperties=font)
         ax1.set_ylabel('保持率', fontproperties=font)
@@ -396,7 +413,7 @@ def cycledetail(request):
         ax1.set_xlabel('循环圈数', fontproperties=font)
         ax2.set_xlabel('循环圈数', fontproperties=font)
        
-        if detail_type == 'barcode':
+        if detail_type == 'barcode' or detail_type=='redraw':
             ax1.set_ylim(keeplow,keephigh)
             ax2.set_ylim(kulunlow, kulunhigh)  
              # 设定 x 轴下限为 0
@@ -413,9 +430,16 @@ def cycledetail(request):
         img=base64.b64encode(buffer.getvalue()).decode()
         # 清空缓冲区
         buffer.truncate(0)
-    
-    df['Test_StartTime'] = df['Test_StartTime'].dt.strftime('%Y-%m-%d %H:%M:%S')
-    df['EndTime'] = df['EndTime'].dt.strftime('%Y-%m-%d %H:%M:%S')
+
+        # if detail_type != 'redraw':
+        if pd.api.types.is_datetime64_any_dtype(df['Test_StartTime']):
+            df['Test_StartTime'] = df['Test_StartTime'].dt.strftime('%Y-%m-%d %H:%M:%S')
+            df['EndTime'] = df['EndTime'].dt.strftime('%Y-%m-%d %H:%M:%S')
+
+        if pd.api.types.is_datetime64_any_dtype(df['Total_charge_time']):
+            df['Total_charge_time'] = df['Total_charge_time'].dt.strftime('%H:%M:%S')
+            df['Total_discharge_time'] = df['Total_discharge_time'].dt.strftime('%H:%M:%S')
+
     result_detail=df.to_dict(orient='records')
     ls_detail_columns = df.columns.tolist()
     response = {'data':result_detail,
@@ -424,6 +448,14 @@ def cycledetail(request):
                     'img':img}
     context_dict['img']=img
     context_dict['response']=response
+
+    context_dict['crate']=crate
+    context_dict['keeplow']=keeplow
+    context_dict['keephigh']=keephigh
+    context_dict['kulunlow']=kulunlow
+    context_dict['kulunhigh']=kulunhigh
+    context_dict['key']=solokey
+
       
     return render(request,'lims/cycledetail.html',context_dict) 
 

@@ -1,7 +1,30 @@
 {% extends 'lims/base_ui.html' %}
 {% block title %}查询循环数据{% endblock %}
 {% block content %}
+<style>
+  .k-numeric-wrap {
+          width: 60px; /* 设置 NumericTextBox 的宽度 */
+          margin-right: 100px;
+      }
+</style>
 <div class='row-fluid' id="app">
+  <div class="transparent-container">
+    <!-- 标题 -->
+    <div class="container-title">作图设置</div>
+    <div class="radio-container d-inline-block">
+      <label for="crate">倍率:</label>
+      <input id="crate" style="width: 100px;" />
+      <label for="keeplow">保持率坐标低值:</label>
+      <input id="keeplow" style="width: 100px;"/>
+      <label for="keephigh">保持率坐标高值:</label>
+      <input id="keephigh" style="width: 100px;"/>
+      <label for="kulunplow">库伦效率坐标低值:</label>
+      <input id="kulunlow" style="width: 100px;"/>
+      <label for="kulunhigh">库伦效率坐标高值:</label>
+      <input id="kulunhigh" style="width: 100px;"/>
+      <button type='button' class='btn btn-primary' id="getdata">重新作图</button>
+    </div>
+  </div>
     
     <img id="image"  src="" alt="Image">
     </br>
@@ -12,6 +35,71 @@
 <script>
      //initiate the date picker widges
      $(document).ready(function() {
+        // 作图设置
+        
+        var crate = {{ crate | safe }}
+        var keeplow = {{ keeplow | safe }}
+        var keephigh = {{ keephigh | safe }}
+        var kulunlow = {{ kulunlow | safe }}
+        var kulunhigh = {{ kulunhigh | safe }}
+        var rediskey = "{{ key | safe }}"
+
+        if (crate<0)
+        {
+          crate = 0.3
+          keeplow = 0.8
+          keephigh = 1.2
+          kulunlow = 0.8
+          kulunhigh = 1.2
+        }
+        var dbname = 'redraw'
+        var cyclecount = 1000000
+        var startdate = '20220101'
+        var basecycle = 1
+
+  
+        $("#crate").kendoNumericTextBox(
+          {
+            value: crate,
+            min: 0, // 最小值为0
+            format: "n2"
+          }
+        );
+
+        $("#keeplow").kendoNumericTextBox(
+          {
+            value: keeplow,
+            min: 0, // 最小值为0
+            max: 3, // 最大值为3
+            format: "n2"
+          }
+        );
+        $("#keephigh").kendoNumericTextBox(
+          {
+            value: keephigh,
+            min: 0, // 最小值为0
+            max: 3, // 最大值为3
+            format: "n2"
+          }
+        );
+        $("#kulunlow").kendoNumericTextBox(
+          {
+            value: kulunlow,
+            min: 0, // 最小值为0
+            max: 3, // 最大值为3
+            format: "n2"
+          }
+        );
+        $("#kulunhigh").kendoNumericTextBox(
+          {
+            value: kulunhigh,
+            min: 0, // 最小值为0
+            max: 3, // 最大值为3
+            format: "n2"
+          }
+        );
+
+
          // 设置图片"
          var img = "{{ img | safe }}"
          var base64ImageData = "data:image/jpeg;base64,"+img
@@ -19,6 +107,24 @@
         document.getElementById("image").src = base64ImageData    
         var response = {{ response | safe }}
         generateGrid('resultdetail',response);  
+        $("#getdata").kendoButton({
+            click: function () {
+              crate = $("#crate").data("kendoNumericTextBox").value();
+
+              keeplow = $("#keeplow").data("kendoNumericTextBox").value();
+              keephigh = $("#keephigh").data("kendoNumericTextBox").value();
+              kulunlow = $("#kulunlow").data("kendoNumericTextBox").value();
+              kulunhigh = $("#kulunhigh").data("kendoNumericTextBox").value();
+               // 构建URL
+               var url = "/lims/cycledetail?key=" + encodeURIComponent(rediskey) + "&xuhao=1" 
+                                        +'&cr='+encodeURIComponent(crate)+'&pl='+encodeURIComponent(keeplow)+'&ph='+encodeURIComponent(keephigh)
+                                        +'&bc='+encodeURIComponent(basecycle)+'&kl='+encodeURIComponent(kulunlow)+'&kh='+encodeURIComponent(kulunhigh)
+                                        +'&cc='+encodeURIComponent(cyclecount)  +'&sd='+encodeURIComponent(startdate)
+                                        +'&db='+encodeURIComponent(dbname) +'&tp='+'redraw'
+                              // 使用window.open打开新窗口
+              window.open(url);  
+            }
+        })
                 
     });    
    
