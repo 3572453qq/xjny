@@ -1,0 +1,97 @@
+{% extends 'lims/base_ui.html' %}
+{% block title %}生成签名{% endblock %}
+{% block content %}
+<style>
+    .k-textbox{
+       width: 500px;
+}
+</style>
+<label for="cnname">中文名 ：</label>
+<input id="cnname" />
+</br>
+<label for="enname">英文名：</label>
+<input id="enname" />
+</br>
+<label for="title">职位：</label>
+<input id="title" />
+</br>
+<label for="dept">部门：</label>
+<input id="dept" />
+</br>
+<label for="email">邮箱：</label>
+<input id="email" />
+</br>
+<label for="phone">联系电话：</label>
+<input id="phone" />
+</br>
+<button type='button' class='btn btn-primary' id="generate">生成签名</button>
+</br>
+<div id="result"></div>
+</br>
+<div id="textBox"></div>
+<script>
+     $("#cnname").kendoTextBox({
+            placeholder: "填入中文姓名，例如：张三",
+    });
+    $("#enname").kendoTextBox({
+            placeholder: "填入英文名，例如：San Zhang"
+    });
+    $("#title").kendoTextBox({
+            placeholder: "填入职位，例如：销售经理"
+    });
+    $("#dept").kendoTextBox({
+            placeholder: "填入部门，例如：行政部"
+    });
+    $("#email").kendoTextBox({
+            value: "@intech.com.cn"
+    });
+    $("#phone").kendoTextBox({
+        placeholder: "填入联系电话"
+    });
+    $("#generate").kendoButton({
+        click: function () {
+            var cnname=$("#cnname").data("kendoTextBox").value();
+            var enname=$("#enname").data("kendoTextBox").value();
+            var title=$("#title").data("kendoTextBox").value();
+            var dept=$("#dept").data("kendoTextBox").value();
+            var email=$("#email").data("kendoTextBox").value();
+            var phone=$("#phone").data("kendoTextBox").value();
+            console.log(cnname)
+            console.log(enname)
+            console.log(title)
+            let htmlCode = `
+            <style class="fox_global_style">
+			div.fox_html_content { line-height: 1.5;}
+			blockquote { margin-Top: 0px; margin-Bottom: 0px; margin-Left: 0.5em }
+			ol, ul { margin-Top: 0px; margin-Bottom: 0px; list-style-position: inside; }
+			p { margin-Top: 0px; margin-Bottom: 0px }
+</style><div style="MARGIN: 10px; FONT-FAMILY: verdana; FONT-SIZE: 10pt"><table border="0" cellpadding="0" cellspacing="0" style="font-family:Palatino;font-size:16px;margin-left:0;margin-right:auto;width:440px" width="100%"><tbody><tr><td><table border="0" cellpadding="0" cellspacing="0" style="margin-bottom:10px;margin-left:0;margin-right:auto;width:auto" width="100%"><tbody><tr><td style="padding-right:20px;border-right:3px solid #3b6299"><img src="https://www.logosc.cn/ubrand/oss/signatures/isXX_hgpHY.png" style="display: block; outline: 0px; border: none; border-radius: 10px; height: 90px; max-width: 134px; object-fit: contain;"></td><td style="padding-left:20px"><h3 style="font-size: 1.125em; line-height: 1.75; margin: 0px; color: rgb(59, 98, 153);">${cnname} ${enname}</h3><p style="font-size: 0.75em; line-height: 1; margin-right: 0px; margin-bottom: 12px; margin-left: 0px;">${title} | ${dept}</p><p style="font-size: 0.75em; line-height: 2; margin-right: 0px; margin-left: 0px;"><img src="https://www.logosc.cn/email-signature-generator/_next/static/media/email.1d842d7e.png" style="display: inline; outline: 0px; border: none; height: 14px; vertical-align: -3px; width: 14px; background: rgb(59, 98, 153); margin-right: 4px;"><a href="mailto:${email}" style="color: rgb(51, 51, 51); text-decoration-line: none;">${email}</a></p><p style="font-size: 0.75em; line-height: 2; margin-right: 0px; margin-left: 0px;"><img src="https://www.logosc.cn/email-signature-generator/_next/static/media/mobile.326f1fab.png" style="display: inline; outline: 0px; border: none; height: 14px; vertical-align: -3px; width: 14px; background: rgb(59, 98, 153); margin-right: 4px;"><a href="tel:${phone}" style="color: rgb(51, 51, 51); text-decoration-line: none;">${phone}</a></p></td></tr></tbody></table><div><p style="font-size: 0.75em; line-height: 2; margin-right: 0px; margin-left: 0px;"><img src="https://www.logosc.cn/email-signature-generator/_next/static/media/address.cda8427d.png" style="display: inline; outline: 0px; border: none; height: 14px; vertical-align: -3px; width: 14px; background: rgb(59, 98, 153); margin-right: 4px;">深圳市龙华区翰宇创新大厦B栋5-7楼</p></div></td></tr></tbody></table></div>
+            `;
+
+            $("#result").empty();
+            $("#result").html(htmlCode)
+
+            $("#textBox").text(htmlCode);
+            $("textBox").select()
+            
+            const textarea = document.createElement("textarea");
+            textarea.value = htmlCode;
+
+            // 将textarea添加到DOM中
+            document.body.appendChild(textarea);
+
+            // 选中textarea中的内容
+            textarea.select();
+
+            // 复制内容到剪贴板
+            document.execCommand("copy");
+
+            // 删除textarea元素
+            document.body.removeChild(textarea);
+
+            // 提示用户复制成功
+            alert("您已成功生成签名，签名已经复制，如果满意签名效果，请直接进入foxmail的签名设置，根据杜工发的提示将签名粘贴进去");
+        }
+    })
+</script>
+{% endblock %}

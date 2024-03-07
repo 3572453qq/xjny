@@ -673,3 +673,6 @@ def get_function_tree(request):
 
     # 返回 JSON 格式的功能树数据
     return JsonResponse(function_tree, safe=False)
+
+def signature(request):
+    return render(request,'lims/signature.html')
