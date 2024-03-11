@@ -30,7 +30,7 @@ class pagepermission(models.Model):
                        ("cycleexcel", "Can handle cycleexcel"),("labfunction", "Can view lab function"),
                        ("crateexcel", "Can handle crateexcel"),("cyclebybarcode", "Can search by barcode"),
                        ("cyclesummary", "Can search summary"),("hrfunction", "Can view hr function"),
-                       ("joindate", "Can maintain joindate"),
+                       ("joindate", "Can maintain joindate"),('signature','Can generate signature')
         )
 
 class appfunction(models.Model):
