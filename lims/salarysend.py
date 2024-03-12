@@ -139,7 +139,7 @@ def hangdlesalary(request):
 
         all_messages,all_names = processfile(filename,yearmonth)
         for message in all_messages:
-            send_wechat_message(corpID, agentID, corpSecret, toUser, message)
+            # send_wechat_message(corpID, agentID, corpSecret, toUser, message)
             time.sleep(2.3)
             send_result_to_frontend(channel_name, message)
         
