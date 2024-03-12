@@ -25,4 +25,5 @@ urlpatterns = [
     path('get_function_tree', views.get_function_tree,name='get_function_tree'), 
     path('index', views.index,name='index'), 
     path('signature', views.signature,name='signature'), 
+    path('sendsalary', views.sendsalary,name='sendsalary'), 
 ]

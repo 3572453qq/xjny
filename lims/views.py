@@ -676,3 +676,7 @@ def get_function_tree(request):
 
 def signature(request):
     return render(request,'lims/signature.html')
+
+
+def sendsalary(request):
+    return render(request,'lims/sendsalary.html')
