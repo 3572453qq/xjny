@@ -2,7 +2,8 @@
 from django.contrib import admin
 from django.urls import path
 from . import views
-from . import cycleprocess
+from . import cycleprocess,kdgriddml
+from django.urls import re_path
 urlpatterns = [
     path('', views.index, name='index'),
     path('vkeepexcel', views.vkeepexcel,name='vkeepexcel'),
@@ -26,4 +27,6 @@ urlpatterns = [
     path('index', views.index,name='index'), 
     path('signature', views.signature,name='signature'), 
     path('sendsalary', views.sendsalary,name='sendsalary'), 
+    re_path(r'^listing/(?P<model_name>[\w\-]+)$',
+        kdgriddml.listing, name='listing'),
 ]
