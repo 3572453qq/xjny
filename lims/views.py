@@ -679,4 +679,4 @@ def signature(request):
 
 
 def sendsalary(request):
-    return render(request,'lims/sendsalary.html')
+    return render(request,'lims/sendsalary.html') 
