@@ -59,14 +59,93 @@
             console.log(cnname)
             console.log(enname)
             console.log(title)
-            let htmlCode = `
-            <style class="fox_global_style">
-			div.fox_html_content { line-height: 1.5;}
-			blockquote { margin-Top: 0px; margin-Bottom: 0px; margin-Left: 0.5em }
-			ol, ul { margin-Top: 0px; margin-Bottom: 0px; list-style-position: inside; }
-			p { margin-Top: 0px; margin-Bottom: 0px }
-</style><div style="MARGIN: 10px; FONT-FAMILY: verdana; FONT-SIZE: 10pt"><table border="0" cellpadding="0" cellspacing="0" style="font-family:Palatino;font-size:16px;margin-left:0;margin-right:auto;width:440px" width="100%"><tbody><tr><td><table border="0" cellpadding="0" cellspacing="0" style="margin-bottom:10px;margin-left:0;margin-right:auto;width:auto" width="100%"><tbody><tr><td style="padding-right:20px;border-right:3px solid #3b6299"><img src="https://www.logosc.cn/ubrand/oss/signatures/isXX_hgpHY.png" style="display: block; outline: 0px; border: none; border-radius: 10px; height: 90px; max-width: 134px; object-fit: contain;"></td><td style="padding-left:20px"><h3 style="font-size: 1.125em; line-height: 1.75; margin: 0px; color: rgb(59, 98, 153);">${cnname} ${enname}</h3><p style="font-size: 0.75em; line-height: 1; margin-right: 0px; margin-bottom: 12px; margin-left: 0px;">${title} | ${dept}</p><p style="font-size: 0.75em; line-height: 2; margin-right: 0px; margin-left: 0px;"><img src="https://www.logosc.cn/email-signature-generator/_next/static/media/email.1d842d7e.png" style="display: inline; outline: 0px; border: none; height: 14px; vertical-align: -3px; width: 14px; background: rgb(59, 98, 153); margin-right: 4px;"><a href="mailto:${email}" style="color: rgb(51, 51, 51); text-decoration-line: none;">${email}</a></p><p style="font-size: 0.75em; line-height: 2; margin-right: 0px; margin-left: 0px;"><img src="https://www.logosc.cn/email-signature-generator/_next/static/media/mobile.326f1fab.png" style="display: inline; outline: 0px; border: none; height: 14px; vertical-align: -3px; width: 14px; background: rgb(59, 98, 153); margin-right: 4px;"><a href="tel:${phone}" style="color: rgb(51, 51, 51); text-decoration-line: none;">${phone}</a></p></td></tr></tbody></table><div><p style="font-size: 0.75em; line-height: 2; margin-right: 0px; margin-left: 0px;"><img src="https://www.logosc.cn/email-signature-generator/_next/static/media/address.cda8427d.png" style="display: inline; outline: 0px; border: none; height: 14px; vertical-align: -3px; width: 14px; background: rgb(59, 98, 153); margin-right: 4px;">深圳市龙华区翰宇创新大厦B栋5-7楼</p></div></td></tr></tbody></table></div>
-            `;
+//             let htmlCode = `
+//             <style class="fox_global_style">
+// 			div.fox_html_content { line-height: 1.5;}
+// 			blockquote { margin-Top: 0px; margin-Bottom: 0px; margin-Left: 0.5em }
+// 			ol, ul { margin-Top: 0px; margin-Bottom: 0px; list-style-position: inside; }
+// 			p { margin-Top: 0px; margin-Bottom: 0px }
+// </style><div style="MARGIN: 10px; FONT-FAMILY: verdana; FONT-SIZE: 10pt"><table border="0" cellpadding="0" cellspacing="0" style="font-family:Palatino;font-size:16px;margin-left:0;margin-right:auto;width:440px" width="100%"><tbody><tr><td><table border="0" cellpadding="0" cellspacing="0" style="margin-bottom:10px;margin-left:0;margin-right:auto;width:auto" width="100%"><tbody><tr><td style="padding-right:20px;border-right:3px solid #3b6299"><img src="https://www.logosc.cn/ubrand/oss/signatures/isXX_hgpHY.png" style="display: block; outline: 0px; border: none; border-radius: 10px; height: 90px; max-width: 134px; object-fit: contain;"></td><td style="padding-left:20px"><h3 style="font-size: 1.125em; line-height: 1.75; margin: 0px; color: rgb(59, 98, 153);">${cnname} ${enname}</h3><p style="font-size: 0.75em; line-height: 1; margin-right: 0px; margin-bottom: 12px; margin-left: 0px;">${title} | ${dept}</p><p style="font-size: 0.75em; line-height: 2; margin-right: 0px; margin-left: 0px;"><img src="https://www.logosc.cn/email-signature-generator/_next/static/media/email.1d842d7e.png" style="display: inline; outline: 0px; border: none; height: 14px; vertical-align: -3px; width: 14px; background: rgb(59, 98, 153); margin-right: 4px;"><a href="mailto:${email}" style="color: rgb(51, 51, 51); text-decoration-line: none;">${email}</a></p><p style="font-size: 0.75em; line-height: 2; margin-right: 0px; margin-left: 0px;"><img src="https://www.logosc.cn/email-signature-generator/_next/static/media/mobile.326f1fab.png" style="display: inline; outline: 0px; border: none; height: 14px; vertical-align: -3px; width: 14px; background: rgb(59, 98, 153); margin-right: 4px;"><a href="tel:${phone}" style="color: rgb(51, 51, 51); text-decoration-line: none;">${phone}</a></p></td></tr></tbody></table><div><p style="font-size: 0.75em; line-height: 2; margin-right: 0px; margin-left: 0px;"><img src="https://www.logosc.cn/email-signature-generator/_next/static/media/address.cda8427d.png" style="display: inline; outline: 0px; border: none; height: 14px; vertical-align: -3px; width: 14px; background: rgb(59, 98, 153); margin-right: 4px;">深圳市龙华区翰宇创新大厦B栋5-7楼</p></div></td></tr></tbody></table></div>
+//             `;
+
+            let htmlCode =`
+            <br>
+<table border="0" cellspacing="0" cellpadding="0" style="width:360px; border-collapse: collapse; border: none;">
+  <tbody>
+    <tr>
+      <td valign="top" style="width: 40%;padding-right: 20px;border-right: 3px solid #3b6299;vertical-align: middle;" >
+        <p align="left" style="text-align:center">
+          <img src="https://lims.inxtech.com.cn:3000/static/assets/img/logo.png">
+        </p>
+      </td>
+      <td valign="top" style="width: 60%;padding-left: 20px;">
+        <table border="0" cellspacing="0" cellpadding="0" style="width:100%; border-collapse: collapse; border: none;">
+          <tr>
+            <td colspan="2">
+              <p style="margin: 0;padding: 0; font-size: 1.125em; line-height: 1.75;text-align: left; color: rgb(59, 98, 153);white-space: nowrap;">
+                <b>${cnname} ${enname}</b>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <p style="margin: 0;padding: 0; font-size: 0.75em;text-align: left; line-height: 1.2;">
+                <span>${title} | ${dept}</span>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: middle;width: 5%;">
+              <p align="left" style="margin: 0;padding: 0;font-size: 0.75em; text-align:left;line-height: 2;">
+                <span><img src="https://lims.inxtech.com.cn:3000/static/assets/img/mail.png"></span>
+              </p>
+            </td>
+            <td>
+              <p style="margin: 0;padding: 0; font-size: 0.75em; text-align: left;line-height: 2;white-space: nowrap;">
+                <span>
+                  <a href="mailto:${email}" style="color: rgb(51, 51, 51); text-decoration: none;">&nbsp;${email}</a>
+                </span>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="vertical-align: middle;width: 5%;">
+              <p align="left" style="margin: 0;padding: 0;font-size: 0.75em; text-align:left;line-height: 2;">
+                <span><img src="https://lims.inxtech.com.cn:3000/static/assets/img/tel.png"></span>
+              </p>
+            </td>
+            <td>
+              <p style="margin: 0;padding: 0; font-size: 0.75em; text-align: left;line-height: 2;white-space: nowrap;">
+                <span><a href="tel:${phone}" style="color: rgb(51, 51, 51); text-decoration: none;">&nbsp;${phone}</a></span>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <table border="0" cellspacing="0" cellpadding="0" style="width:100%; border-collapse: collapse; border: none;">
+          <tbody>
+            <tr>
+              <td style="vertical-align: middle;width: 5%;">
+                <p align="left" style="margin: 0;padding: 0;font-size: 0.75em; text-align:left;line-height: 2;">
+                  <span><img src="https://lims.inxtech.com.cn:3000/static/assets/img/add.png"></span>
+                </p>
+              </td>
+              <td>
+                <p style="margin: 0;padding: 0; font-size: 0.75em; text-align: left;line-height: 2;white-space: nowrap;">
+                  <span style="color: #000; text-decoration: none;">深圳市龙华区翰宇创新大厦B栋5-7楼</span>
+                </p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </td>
+    </tr>
+   </tbody>
+</table>            
+`
 
             $("#result").empty();
             $("#result").html(htmlCode)
