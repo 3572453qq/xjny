@@ -15,7 +15,7 @@ scp_files_to_production_server:
     - for file in $files ;do scp -i $IDENTITY ./$file root@$REMOTEHOST:/$BASEDIR/$file ;done
     - ssh -i $IDENTITY root@$REMOTEHOST "supervisorctl stop xjny:*"
     - ssh -i $IDENTITY root@$REMOTEHOST "cd $BASEDIR; python3 manage.py makemigrations;python3 manage.py migrate"
-    - ssh -i $IDENTITY root@$REMOTEHOST "cd $BASEDIR; python3 manage.py collectstatic"
+    # - ssh -i $IDENTITY root@$REMOTEHOST "cd $BASEDIR; python3 manage.py collectstatic"
     - ssh -i $IDENTITY root@$REMOTEHOST "supervisorctl start xjny:*"
     - ssh -i $IDENTITY root@$REMOTEHOST "echo 'hello1' > /tmp/1.txt"
   only:
