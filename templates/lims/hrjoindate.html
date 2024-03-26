@@ -60,7 +60,7 @@
       }
       function generateGrid(gridId,data,columns)
       {
-
+        
 
         $("#" + gridId).kendoGrid({
             dataSource: {
@@ -75,16 +75,22 @@
             filterable: true,
         });
         }
-
+        link = window.location.href;
+        let url = new URL(link);
+        let protocol = url.protocol;
+        console.log(protocol+'//'
+                    + window.location.host 
+                    + '/lims/listing/hrjoindate')
+        var datasourcestr=protocol+'//'
+                    + window.location.host 
+                    + '/lims/listing/hrjoindate'
 
         $("#joindate").kendoGrid({
         dataSource: {
             // type: "odata",
             transport: {
                 read: {
-                    url: 'http://'
-                    + window.location.host 
-                    + '/lims/listing/hrjoindate',
+                    url: datasourcestr,
                     dataType: 'json',
                     type: 'GET'
                 }
