@@ -45,3 +45,28 @@ class appfunction(models.Model):
         max_length=256, verbose_name='功能描述', null=True, blank=True)
     parentid = models.IntegerField(
         verbose_name='父功能节点', null=False, default=1)
+    
+class cellapply(models.Model):
+    id = models.AutoField(primary_key=True)
+    applyid = models.CharField(
+        max_length=64, verbose_name='流程号', null=False, blank=True)
+    applier =  models.CharField(
+        max_length=64, verbose_name='申请人', null=True, blank=True)
+    apply_dep =  models.CharField(
+        max_length=256, verbose_name='申请部门', null=True, blank=True)
+    reason = models.CharField(
+        max_length=256, verbose_name='申请事由', null=False, blank=True)
+    spec = models.CharField(
+        max_length=64, verbose_name='电芯规格', null=True, blank=True)
+    pn_material = models.CharField(
+        max_length=256, verbose_name='正极和负极', null=True, blank=True)
+    electro_material = models.CharField(
+        max_length=256, verbose_name='电解液/固态电解质膜的材料', null=True, blank=True)    
+    electro_source = models.CharField(
+        max_length=256, verbose_name='电解液/固态电解质膜的来源', null=True, blank=True)
+    formula_code = models.CharField(
+        max_length=256, verbose_name='配方编码', null=True, blank=True)
+    is34ah = models.BooleanField(
+        max_length=64, verbose_name='是否3.4Ah或以下', null=True, blank=True)
+    quantity = models.IntegerField(
+        verbose_name='电芯需求数量', null=False, default=1)
