@@ -30,6 +30,10 @@
     }
 
     $("#stockoutform").kendoForm({
+            messages: {
+                submit: "出库",
+                clear: "清除"
+            },
             orientation: "horizontal",
             formData: {
                     type_id: 2,

@@ -30,7 +30,11 @@
     }
 
     $("#stockinform").kendoForm({
-            orientation: "horizontal",
+        messages: {
+                submit: "入库",
+                clear: "清除"
+            },
+        orientation: "horizontal",
         formData: {
                     type_id: 2,
                     source_id: 1,
