@@ -1,0 +1,213 @@
+{% extends 'lims/base_ui.html' %}
+{% block title %}电芯出库{% endblock %}
+{% block content %}
+
+<div class="demo-section">
+<div id="validation-success"></div>
+<form id="stockoutform"></div>
+</div>
+
+</br>
+<div id="stockout"></div>
+
+
+
+<script>
+
+    all_types = {{ all_types|safe }}
+    stockouts = {{ stockouts|safe }}
+    all_teams = {{ all_teams|safe }} 
+
+    console.log(all_types)
+    console.log(stockouts)
+    console.log(all_teams)
+
+    // 形成kendoform
+    var validationSuccess = $("#validation-success");
+    function sleep(delay) {
+        var start = new Date().getTime();
+        while (new Date().getTime() < start + delay);
+    }
+
+    $("#stockoutform").kendoForm({
+            orientation: "horizontal",
+            formData: {
+                    type_id: 2,
+                    recipient_id: 1,
+                    quantity: 1,
+                    price: 0,
+                    outdate: new Date(),                    
+                    DateTimePicker: new Date(),
+                    staff: '郑振彬'                  
+                },            
+            items: [   
+                {   editor: "DropDownList", field: "type_id", label: "电芯类型", 
+                    editorOptions:{
+                        dataSource: all_types,
+                        dataValueField: "value", 
+                        dataTextField: "text" 
+                    },
+                    validation: {required: true }
+                },
+                { editor: "DropDownList",  field: "recipient_id", label: "领用部门", 
+                    editorOptions:{
+                        dataSource: all_teams,
+                        dataValueField: "value", 
+                        dataTextField: "text" 
+                    },
+                    validation: {required: true }
+                },                  
+                { editor: "NumericTextBox", field: "quantity", label: "出库数量", validation: {required: true } },
+                { editor: "NumericTextBox", field: "price", label: "出库单价" },
+                { editor: "DatePicker", field: "outdate", label: "出库日期" ,
+                    editorOptions:{
+                        format: "yyyy-MM-dd",
+                    } 
+                },
+                { editor: "MaskedTextBox", field: "staff", label: "领用人"},
+                { editor: "MaskedTextBox", field: "memo", label: "备注" },
+                
+            ],
+            validateField: function (e) {
+                    validationSuccess.html("");
+                },
+                submit: function (e) {
+                    e.preventDefault();
+                    console.log('imthere')
+                    validationSuccess.html("<div class='k-messagebox k-messagebox-success'>Form data is valid!</div>");
+                    var form = $(e.sender.element);
+                    $.ajax({
+                        url: '/lims/stockout_create', 
+                        type: 'POST',
+                        data: form.serialize(),
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                alert('出库成功！');
+                            } else {
+                                alert('出库失败！'+response.errmsg);
+                            }
+                            sleep(500)  //等待0.5秒
+                            window.location.href = window.location.href;
+                        }
+                    });
+                },
+                clear: function (ev) {
+                    validationSuccess.html("");
+                }
+        });
+
+    $("#stockout").kendoGrid({
+        dataSource: {
+            data: stockouts,
+            pageSize: 20,
+        },
+        sortable: true,
+        resizable: true,
+        pageable: { numeric: true,
+            previousNext: true,
+            responsive: false,
+        },
+
+        columns: [
+            {
+                field: 'type_id',
+                values: all_types,
+                title: '电芯类型'
+            },
+            {
+                field: 'recipient_id',
+                values: all_teams,
+                title: '领用部门'
+            },
+            {
+                field: 'quantity',
+                title: '出库数量'
+            },
+            {
+                field: 'price',
+                title: '出库单价'
+            },
+            {
+                field: 'outdate',
+                title: '出库日期'
+            },
+            {
+                field: 'staff',
+                title: '领用人'
+            },
+            {
+                field: 'memo',
+                title: '备注'
+            },
+            {
+                title: '操作',
+                command: [
+                    {
+                        name: "撤销出库",
+                        click: function (e) {
+
+                            // prevent page scroll position change
+                            e.preventDefault();
+                            // e.target is the DOM element representing the button
+                            var tr = $(e.target).closest("tr"); // get the current table row (tr)
+                            // get the data bound to the current table row
+                            thisItem = this.dataItem(tr);
+                            cancel_id = thisItem.id
+                            iddata = {'id':cancel_id}
+                            // 创建确认对话框
+                            var dialog = $("<div></div>").kendoDialog({
+                                width: "400px",
+                                title: "确认删除",
+                                closable: false,
+                                modal: true,
+                                content: "<p>你确定要撤销这条出库记录吗？</p>",
+                                actions: [
+                                    {
+                                        text: "确定",
+                                        primary: true,
+                                        action: function(e) {
+                                            // 在这里执行删除操作
+                                            console.log("执行删除操作");
+                                            $.ajax({
+                                                url: '/lims/stockout_cancel', 
+                                                type: 'POST',
+                                                data: iddata,
+                                                success: function(response) {
+                                                    if (response.status === 'success') {
+                                                        alert('撤销出库成功！');
+                                                    } else {
+                                                        alert('撤销出库失败:'+response.errmsg); 
+                                                    }
+                                                    sleep(500)  //等待0.5秒
+                                                    window.location.href = window.location.href;
+                                                }
+                                            });
+                                            dialog.data("kendoDialog").close(); // 关闭对话框
+                                        }
+                                    },
+                                    {
+                                        text: "取消",
+                                        action: function(e) {
+                                            console.log("取消删除");
+                                            dialog.data("kendoDialog").close(); // 关闭对话框
+                                        }
+                                    }
+                                ]
+                            });
+
+                            dialog.data("kendoDialog").open(); // 打开对话框
+
+                            
+
+
+                        }
+                    }]
+            }
+        ],
+       
+    }); 
+ 
+    
+</script>
+
+{% endblock content %}

@@ -1,0 +1,106 @@
+{% extends 'lims/base_ui.html' %}
+{% block title %}电芯来源维护{% endblock %}
+{% block content %}
+
+<div id="cellsource"></div>
+
+
+<script>
+    var copiedrow = false
+    $("#cellsource").kendoGrid({
+        dataSource: {
+            transport: {
+                read: {
+                    url:  '/lims/listing/cellsource',
+                    dataType: 'json',
+                    type: 'GET'
+                },
+                create: {
+                    url:  '/lims/create/cellsource',
+                    dataType: 'json',
+                    type: 'POST'
+                },
+                update: {
+                    url:  '/lims/updatelist/cellsource',
+                    dataType: 'json',
+                    type: 'POST'
+                },
+                destroy: {
+                    url:  '/lims/delete/cellsource',
+                    dataType: 'json',
+                    type: 'POST'
+                }
+
+
+            },
+            schema: {
+                data: "Data",
+                total: "total",
+                model: {
+                    id: "id",
+                    fields: {
+                        id: {
+                            type: "string",
+                        },
+                        source_name: {
+                            type: "string",                           
+                        },                       
+                    }
+                }
+            },
+            pageSize: 20,
+           
+
+        },
+        editable: 'inline',
+        sortable: true,
+        resizable: true,
+        pageable: { numeric: true,
+            previousNext: true,
+            responsive: false,
+
+        },
+        toolbar: ["create", "save", "cancel","search"],
+        search: {
+            fields: ["source_name"]
+        },
+        columns: [
+            {
+                field: 'source_name',
+                title: '电芯来源'
+            },            
+            {
+                title: '操作',
+                command: ['edit', 'destroy',
+                    {
+                        name: "复制本行",
+                        click: function (e) {
+
+                            // prevent page scroll position change
+                            e.preventDefault();
+                            // e.target is the DOM element representing the button
+                            var tr = $(e.target).closest("tr"); // get the current table row (tr)
+                            // get the data bound to the current table row
+                            newItem = this.dataItem(tr);
+                            this.addRow()
+                            copiedrow=true
+
+                        }
+                    }]
+            }
+        ],
+        edit: function (e) {
+            if (e.model.isNew()&&copiedrow) {
+                e.model.set("source_name", newItem.source_name)
+                copiedrow=false
+            }
+        },
+    }); 
+ 
+      
+      
+    
+
+</script>
+
+{% endblock content %}

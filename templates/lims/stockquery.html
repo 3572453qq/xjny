@@ -1,0 +1,53 @@
+{% extends 'lims/base_ui.html' %}
+{% block title %}电芯库存查询{% endblock %}
+{% block content %}
+
+
+<div id="stock"></div>
+
+
+
+<script>
+
+    all_types = {{ all_types|safe }}
+    stocks = {{ stocks|safe }}
+
+    console.log(all_types)
+    console.log(stocks)
+
+    
+
+    $("#stock").kendoGrid({
+        dataSource: {
+            data: stocks,
+            pageSize: 20,
+        },
+        sortable: true,
+        resizable: true,
+        pageable: { numeric: true,
+            previousNext: true,
+            responsive: false,
+        },
+
+        columns: [
+            {
+                field: 'type_id',
+                values: all_types,
+                title: '电芯类型'
+            },
+            {
+                field: 'quantity',
+                title: '库存数量'
+            },
+            {
+                field: 'last_operate_date',
+                title: '最后变动日期'
+            },            
+        ],
+       
+    }); 
+ 
+    
+</script>
+
+{% endblock content %}

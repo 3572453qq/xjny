@@ -1,0 +1,30 @@
+<form id="stockinForm_post" method="post">
+    {% csrf_token %}
+    <label for="type_id">电芯类型：</label>
+    <select id="type_id" name="type_id">
+        {% for cell_type in cell_types %}
+            <option value="{{ cell_type.id }}">{{ cell_type.type_name }}</option>
+        {% endfor %}
+    </select><br><br>
+
+    <label for="source_id">电芯来源：</label>
+    <select id="source_id" name="source_id">
+        {% for cell_source in cell_sources %}
+            <option value="{{ cell_source.id }}">{{ cell_source.source_name }}</option>
+        {% endfor %}
+    </select><br><br>
+
+    <label for="quantity">入库数量：</label>
+    <input type="number" id="quantity" name="quantity" required><br><br>
+
+    <label for="price">入库单价：</label>
+    <input type="number" id="price" name="price"><br><br>
+
+    <label for="staff">交付人：</label>
+    <input type="text" id="staff" name="staff" required><br><br>
+
+    <label for="memo">备注：</label>
+    <input type="text" id="memo" name="memo"><br><br>
+
+    
+</form>

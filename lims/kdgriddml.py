@@ -48,8 +48,9 @@ def updatelist(request,model_name):
     var_b=eval(model_name)
     try:
         aline=var_b.objects.filter(pk=l_id).update(**arguments )
-    except:
-        print("id not exist" )
+    except Exception as e:
+
+        print("id not exist",e )
         print(l_id)
     
     

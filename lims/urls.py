@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django.urls import path
 from . import views
-from . import cycleprocess,kdgriddml
+from . import cycleprocess,kdgriddml,wms
 from django.urls import re_path
 urlpatterns = [
     path('', views.index, name='index'),
@@ -27,6 +27,22 @@ urlpatterns = [
     path('index', views.index,name='index'), 
     path('signature', views.signature,name='signature'), 
     path('sendsalary', views.sendsalary,name='sendsalary'), 
+    path('celltype', wms.setcelltype,name='celltype'), 
+    path('cellsource', wms.setcellsource,name='cellsource'), 
+    path('stockin', wms.setstockin,name='stockin'), 
+    path('stockin_form', wms.stockin_form,name='stockin_form'), 
+    path('stockin_create', wms.stockin_create,name='stockin_create'), 
+    path('stockin_cancel', wms.stockin_cancel,name='stockin_cancel'), 
+    path('stockout', wms.setstockout,name='stockout'), 
+    path('stockout_create', wms.stockout_create,name='stockout_create'), 
+    path('stockout_cancel', wms.stockout_cancel,name='stockout_cancel'), 
+    path('stockquery', wms.stockquery,name='stockquery'), 
     re_path(r'^listing/(?P<model_name>[\w\-]+)$',
         kdgriddml.listing, name='listing'),
+    re_path(r'^updatelist/(?P<model_name>[\w\-]+)$',
+        kdgriddml.updatelist, name='updatelist'),
+    re_path(r'^create/(?P<model_name>[\w\-]+)$',
+        kdgriddml.createnew, name='createnew'),
+    re_path(r'^delete/(?P<model_name>[\w\-]+)$',
+        kdgriddml.deleteone, name='deleteone'),
 ]
