@@ -223,8 +223,12 @@ def stockout_create(request):
         operate_date = request.POST.get('operate_date', date.today())
 
         # 判断减去库存数量
-        astock = stock.objects.get(pk=type_id) 
-        sum_quantity = astock.quantity
+        try:
+            astock = stock.objects.get(pk=type_id) 
+            sum_quantity = astock.quantity
+        except:
+            sum_quantity = 0
+        
 
         if sum_quantity - quantity < 0:
             errmsg = '库存数量少于需要出库的数量'
