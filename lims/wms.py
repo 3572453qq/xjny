@@ -143,7 +143,7 @@ def stockin_cancel(request):
         type_id = astockin.type_id
         quantity = astockin.quantity
 
-        astock = stock.objects.get(pk=type_id)
+        astock = stock.objects.get(type_id=type_id)
         sum_quantity = astock.quantity
 
         if sum_quantity - quantity < 0:
@@ -224,7 +224,7 @@ def stockout_create(request):
 
         # 判断减去库存数量
         try:
-            astock = stock.objects.get(pk=type_id) 
+            astock = stock.objects.get(type_id=type_id) 
             sum_quantity = astock.quantity
         except:
             sum_quantity = 0
@@ -272,7 +272,7 @@ def stockout_cancel(request):
         type_id = astockout.type_id
         quantity = astockout.quantity
 
-        astock = stock.objects.get(pk=type_id)
+        astock = stock.objects.get(type_id=type_id)
         sum_quantity = astock.quantity
 
        
