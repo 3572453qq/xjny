@@ -148,7 +148,7 @@ def main():
         abs_time = row['EndTime']
         if row['保持率']<ef_thredhold:      
             if findnewtest(computer_name,dev_unit_chl,barcode,abs_time,formatted_date) == 0:           
-                message = f'条码为{barcode}的电芯在通道{dev_unit_chl}中保持率已经低于{ef_thredhold}，当前保持率为：{row["保持率"]}，库伦效率为：{row["库伦效率"]}，请及时检查'
+                message = f'条码为{barcode}的电芯在上位机{computer_name}的通道{dev_unit_chl}中保持率已经低于{ef_thredhold}，当前保持率为：{row["保持率"]}，库伦效率为：{row["库伦效率"]}，请及时检查'
                 
                 send_wechat_message('wwc75be524bd50ea62', '1000016', 'pILyhKytz4T1WvcpLpBgXEhWqLy7gAdr6TglVGoGJTI', 
                         'huangchao', message)
@@ -166,7 +166,7 @@ def main():
                         'HuangYuanHui', message)
         if row['库伦效率']<kl_threadhold:
             if findnewtest(computer_name,dev_unit_chl,barcode,abs_time,formatted_date) == 0:   
-                message = f'条码为{barcode}的电芯在通道{dev_unit_chl}中库伦效率已经低于{kl_threadhold}，当前保持率为：{row["保持率"]}，库伦效率为：{row["库伦效率"]}，请及时检查'
+                message = f'条码为{barcode}的电芯在上位机{computer_name}的通道{dev_unit_chl}中库伦效率已经低于{kl_threadhold}，当前保持率为：{row["保持率"]}，库伦效率为：{row["库伦效率"]}，请及时检查'
                 
                 send_wechat_message('wwc75be524bd50ea62', '1000016', 'pILyhKytz4T1WvcpLpBgXEhWqLy7gAdr6TglVGoGJTI', 
                         'huangchao', message)
