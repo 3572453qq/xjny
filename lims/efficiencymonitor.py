@@ -134,14 +134,23 @@ def main():
     df_cycle = runsqlovertables(start_table,end_table,unique_values_combined,'uat','cycle_id')
     grouped_cycle = df_cycle.groupby(['computer_name','test_id', 'dev_unit_chl'],as_index=False)
     for name, group in grouped_cycle:
+        if len(group)<=2:
+            continue
+        
+        group.sort_values(by='EndTime', inplace=True)
+        group.reset_index(drop=True, inplace=True)
+
         group['保持率'] = (group['discharge_capacity'] / group['discharge_capacity'].iloc[1] ).round(4)
         group['库伦效率'] = (group['discharge_capacity'] / group['charge_capacity'] ).round(4)
 
         # 找到'保持率'这一列最小值的索引
-        idx_min = group['保持率'].idxmin()
+        # idx_min = group['保持率'].idxmin()
+
+        # 找到最后一行
+        lastrow=len(group)-1
 
         # 使用这个索引来获取整行数据
-        row = group.loc[idx_min]
+        row = group.loc[lastrow]
         computer_name = row['computer_name']
         dev_unit_chl  = row['dev_unit_chl']
         barcode = row['barcode']
@@ -149,7 +158,7 @@ def main():
         if row['保持率']<ef_thredhold:      
             if findnewtest(computer_name,dev_unit_chl,barcode,abs_time,formatted_date) == 0:           
                 message = f'条码为{barcode}的电芯在上位机{computer_name}的通道{dev_unit_chl}中保持率已经低于{ef_thredhold}，当前保持率为：{row["保持率"]}，库伦效率为：{row["库伦效率"]}，请及时检查'
-                
+
                 send_wechat_message('wwc75be524bd50ea62', '1000016', 'pILyhKytz4T1WvcpLpBgXEhWqLy7gAdr6TglVGoGJTI', 
                         'huangchao', message)
                 send_wechat_message('wwc75be524bd50ea62', '1000016', 'pILyhKytz4T1WvcpLpBgXEhWqLy7gAdr6TglVGoGJTI', 
@@ -167,7 +176,12 @@ def main():
         if row['库伦效率']<kl_threadhold:
             if findnewtest(computer_name,dev_unit_chl,barcode,abs_time,formatted_date) == 0:   
                 message = f'条码为{barcode}的电芯在上位机{computer_name}的通道{dev_unit_chl}中库伦效率已经低于{kl_threadhold}，当前保持率为：{row["保持率"]}，库伦效率为：{row["库伦效率"]}，请及时检查'
-                
+                print('discharge_capacity:',row['discharge_capacity'])
+                print('charge_capacity:',row['charge_capacity'])
+                print('dev_unit_chl',row['dev_unit_chl'])
+                print('test_id',row['test_id'])
+                print('endtime',row['EndTime'])
+                print('barcode',row['barcode'])
                 send_wechat_message('wwc75be524bd50ea62', '1000016', 'pILyhKytz4T1WvcpLpBgXEhWqLy7gAdr6TglVGoGJTI', 
                         'huangchao', message)
                 send_wechat_message('wwc75be524bd50ea62', '1000016', 'pILyhKytz4T1WvcpLpBgXEhWqLy7gAdr6TglVGoGJTI', 
