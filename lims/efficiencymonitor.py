@@ -133,6 +133,7 @@ def main():
 
     df_cycle = runsqlovertables(start_table,end_table,unique_values_combined,'uat','cycle_id')
     grouped_cycle = df_cycle.groupby(['computer_name','test_id', 'dev_unit_chl'],as_index=False)
+    msg_count = 0
     for name, group in grouped_cycle:
         if len(group)<=2:
             continue
@@ -155,8 +156,13 @@ def main():
         dev_unit_chl  = row['dev_unit_chl']
         barcode = row['barcode']
         abs_time = row['EndTime']
-        if row['保持率']<ef_thredhold:      
-            if findnewtest(computer_name,dev_unit_chl,barcode,abs_time,formatted_date) == 0:           
+        
+        if row['保持率']<ef_thredhold: 
+            msg_count +=1 
+            print('abs_time',abs_time,type(abs_time))   
+            now = datetime.now()
+            time_difference = now - abs_time
+            if findnewtest(computer_name,dev_unit_chl,barcode,abs_time,formatted_date) == 0 and time_difference<timedelta(hours=4) :           
                 message = f'条码为{barcode}的电芯在上位机{computer_name}的通道{dev_unit_chl}中保持率已经低于{ef_thredhold}，当前保持率为：{row["保持率"]}，库伦效率为：{row["库伦效率"]}，请及时检查'
 
                 send_wechat_message('wwc75be524bd50ea62', '1000016', 'pILyhKytz4T1WvcpLpBgXEhWqLy7gAdr6TglVGoGJTI', 
@@ -174,7 +180,11 @@ def main():
                 send_wechat_message('wwc75be524bd50ea62', '1000016', 'pILyhKytz4T1WvcpLpBgXEhWqLy7gAdr6TglVGoGJTI', 
                         'HuangYuanHui', message)
         if row['库伦效率']<kl_threadhold:
-            if findnewtest(computer_name,dev_unit_chl,barcode,abs_time,formatted_date) == 0:   
+            msg_count +=1 
+            print('abs_time',abs_time,type(abs_time))   
+            now = datetime.now()
+            time_difference = now - abs_time
+            if findnewtest(computer_name,dev_unit_chl,barcode,abs_time,formatted_date) == 0 and time_difference<timedelta(hours=4) :   
                 message = f'条码为{barcode}的电芯在上位机{computer_name}的通道{dev_unit_chl}中库伦效率已经低于{kl_threadhold}，当前保持率为：{row["保持率"]}，库伦效率为：{row["库伦效率"]}，请及时检查'
                 print('discharge_capacity:',row['discharge_capacity'])
                 print('charge_capacity:',row['charge_capacity'])
@@ -196,6 +206,7 @@ def main():
                         'mozeqiang', message)
                 send_wechat_message('wwc75be524bd50ea62', '1000016', 'pILyhKytz4T1WvcpLpBgXEhWqLy7gAdr6TglVGoGJTI', 
                         'HuangYuanHui', message)
+    print('msg_count',msg_count)
 
 if __name__ == "__main__":
     # 程序开始时记录时间
