@@ -52,7 +52,7 @@ def setstockin(request):
     context_dict['all_sources'] = companypara_json
 
     # 得到所有status=1的电芯入库记录
-    stockins = stockin.objects.filter(status=1).values()
+    stockins = stockin.objects.filter(status=1).order_by('-indate').values()
 
     for stockin_data in stockins:
        stockin_data['indate'] = stockin_data['indate'].isoformat()
@@ -193,7 +193,7 @@ def setstockout(request):
     context_dict['all_teams'] = companypara_json
 
     # 得到所有status=1的电芯出库记录
-    stockouts = stockout.objects.filter(status=1).values()
+    stockouts = stockout.objects.filter(status=1).order_by('-outdate').values()
 
     for stockout_data in stockouts:
        stockout_data['outdate'] = stockout_data['outdate'].isoformat()

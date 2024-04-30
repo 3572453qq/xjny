@@ -1,7 +1,6 @@
 {% extends 'lims/base_ui.html' %}
 {% block title %}电芯入库{% endblock %}
 {% block content %}
-
 <div class="demo-section">
 <div id="validation-success"></div>
 <form id="stockinform"></div>
@@ -105,6 +104,7 @@
             data: stockins,
             pageSize: 20,
         },
+        // sort: { field: 'indate', dir: 'desc' },  // 指定初始排序
         sortable: true,
         resizable: true,
         pageable: { numeric: true,
