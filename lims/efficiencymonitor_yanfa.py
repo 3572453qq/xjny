@@ -141,7 +141,7 @@ def main():
         group.sort_values(by='EndTime', inplace=True)
         group.reset_index(drop=True, inplace=True)
 
-        group['保持率'] = (group['discharge_capacity'] / group['discharge_capacity'].iloc[1] ).round(4)
+        group['保持率'] = (group['discharge_capacity'] / group['discharge_capacity'].iloc[2] ).round(4)
         group['库伦效率'] = (group['discharge_capacity'] / group['charge_capacity'] ).round(4)
 
         # 找到'保持率'这一列最小值的索引
