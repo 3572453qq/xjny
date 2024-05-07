@@ -140,6 +140,11 @@ def main():
         
         group.sort_values(by='EndTime', inplace=True)
         group.reset_index(drop=True, inplace=True)
+        
+        # 找到最后一行
+        lastrow=len(group)-1
+        if group['barcode'][0] != group['barcode'][lastrow]:
+            continue
 
         group['保持率'] = (group['discharge_capacity'] / group['discharge_capacity'].iloc[1] ).round(4)
         group['库伦效率'] = (group['discharge_capacity'] / group['charge_capacity'] ).round(4)
@@ -147,8 +152,7 @@ def main():
         # 找到'保持率'这一列最小值的索引
         # idx_min = group['保持率'].idxmin()
 
-        # 找到最后一行
-        lastrow=len(group)-1
+        
 
         # 使用这个索引来获取整行数据
         row = group.loc[lastrow]
