@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django.urls import path
 from . import views
-from . import cycleprocess,kdgriddml,wms
+from . import cycleprocess,kdgriddml,wms,codepriv
 from django.urls import re_path
 urlpatterns = [
     path('', views.index, name='index'),
@@ -37,6 +37,11 @@ urlpatterns = [
     path('stockout_create', wms.stockout_create,name='stockout_create'), 
     path('stockout_cancel', wms.stockout_cancel,name='stockout_cancel'), 
     path('stockquery', wms.stockquery,name='stockquery'), 
+    path('setresourcetype', codepriv.setresourcetype,name='setresourcetype'), 
+    path('setresource', codepriv.setresource,name='setresource'), 
+    path('resourcelisting', codepriv.resourcelisting,name='resourcelisting'), 
+    path('coderead', codepriv.coderead,name='coderead'),     
+    path('readresource', codepriv.readresource,name='readresource'), 
     re_path(r'^listing/(?P<model_name>[\w\-]+)$',
         kdgriddml.listing, name='listing'),
     re_path(r'^updatelist/(?P<model_name>[\w\-]+)$',

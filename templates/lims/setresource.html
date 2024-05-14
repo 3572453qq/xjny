@@ -1,0 +1,273 @@
+{% extends 'lims/base_ui.html' %}
+{% block title %}资源维护{% endblock %}
+{% block content %}
+{{ data }}
+<div id="resource"></div>
+
+
+
+
+<script>
+    var copiedrow = false
+    var resourcetype = {{ resourcetype|safe }}
+    var users = {{ users|safe }}
+    var currentuser = {{ currentuser|safe }}
+    var selected_id = -1
+    var resource_user_mapping = {{ resource_user_mapping|safe }}
+    var otheruser = {{ otheruser|safe }}
+
+
+   
+    function generateCode() {
+        // 获取拼音首字母
+        // let pinyinArray = pinyin(resource_name, {
+        //     style: pinyin.STYLE_FIRST_LETTER
+        // });
+
+        // let initials = pinyinArray.map(item => item[0]).join('').toUpperCase();
+
+        // 生成随机的数字序列
+        let randomNumbers = Math.floor(10000000 + Math.random() * 90000000);
+
+        // 组合编码并确保长度为8位
+        let code = randomNumbers;
+
+        // 如果编码长度超过8位，截取前8位
+        if (code.length > 8) {
+            code = code.substring(0, 8);
+        }
+
+        return code;
+    }
+
+    $("#resource").kendoGrid({
+        dataSource: {
+            transport: {
+                read: {
+                    url:  '/lims/resourcelisting',
+                    dataType: 'json',
+                    type: 'GET'
+                },
+                create: {
+                    url:  '/lims/create/resource',
+                    dataType: 'json',
+                    type: 'POST'
+                },
+                update: {
+                    url:  '/lims/updatelist/resource',
+                    dataType: 'json',
+                    type: 'POST'
+                },
+                destroy: {
+                    url:  '/lims/delete/resource',
+                    dataType: 'json',
+                    type: 'POST'
+                }
+
+
+            },
+            schema: {
+                data: "Data",
+                total: "total",
+                model: {
+                    id: "id",
+                    fields: {
+                        id: {
+                            type: "string",
+                        },
+                        type_id: {
+                            type: "string",                           
+                        },
+                        owner_id: {
+                            type: "string", 
+                            defaultValue: currentuser,                          
+                        },
+                        code: {
+                            type: "string",                           
+                        },
+                        desc: {
+                            type: "string",                           
+                        },
+                    }
+                }
+            },
+            pageSize: 20,
+           
+
+        },
+        editable: 'inline',
+        sortable: true,
+        resizable: true,
+        pageable: { numeric: true,
+            previousNext: true,
+            responsive: false,
+        },
+        toolbar: ["create", "save", "cancel","search"],
+        search: {
+            fields: ["type_name","capacity",'positive','negative','formula_code']
+        },
+        columns: [
+            {
+                field: 'type_id',
+                values: resourcetype,
+                title: '类型名称'
+            },  
+            {
+                field: 'owner_id',
+                values: users,
+                title: '资源管理人'
+            }, 
+            {
+                field: 'code',
+                title: '资源编码'
+            },    
+            {
+                field: 'desc',
+                title: '资源说明'
+            },        
+            {
+                title: '操作',
+                command: ['edit', 'destroy',
+                    {
+                        name: "复制本行",
+                        click: function (e) {
+
+                            // prevent page scroll position change
+                            e.preventDefault();
+                            // e.target is the DOM element representing the button
+                            var tr = $(e.target).closest("tr"); // get the current table row (tr)
+                            // get the data bound to the current table row
+                            newItem = this.dataItem(tr);
+                            copiedrow=true
+                            this.addRow()
+                            
+
+                        }
+                    },
+                    {
+                        name: "可查看该资源用户",
+                        click: showMultiSelect 
+                    }
+                ]
+            }
+        ],
+        edit: function (e) {
+            if (e.model.isNew()&&copiedrow) {
+                e.model.set("type_id", newItem.type_id)  
+                e.model.set("owner_id", newItem.owner_id)   
+                e.model.set("code", newItem.code)   
+                e.model.set("desc", newItem.desc)                 
+                copiedrow=false
+            }
+            if (e.model.isNew()){
+                let newcode = generateCode();
+                e.model.set("code", newcode)   
+
+            }
+        },
+    }); 
+
+    console.log(resource_user_mapping)
+
+    function showMultiSelect(e) {        
+        e.preventDefault();
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        selected_id = Number(dataItem.id)
+        // alert(selected_id)
+
+        
+
+        var this_resource_users = resource_user_mapping.filter(item => item.resource_id==selected_id)
+        console.log(this_resource_users)
+
+        
+        var window = $("<div></div>").kendoWindow({
+                title: "请选择可以查看此资源的用户",
+                visible: false, // 初始状态下不可见
+                modal: true, // 模态窗口，点击外部区域不能关闭窗口
+                width: 300,
+                height: 500,
+                actions: [] // 不显示关闭按钮
+            }).data("kendoWindow");
+
+        
+
+        // 创建多选框和确认框
+        var windowContent = ''; 
+
+        // 循环遍历users列表，构建多选框和label标签
+        for (var i = 0; i < otheruser.length; i++) {
+            var isChecked = this_resource_users.some(item => item.user_id === users[i].value);
+            var checkedAttribute = isChecked ? 'checked' : '';
+            windowContent += '<label><input type="checkbox" value="' + users[i].value + '" ' + checkedAttribute + '> ' + users[i].text + '</label><br>';
+            // windowContent += '<label><input type="checkbox" value="' + users[i].value + '"> ' + users[i].text + '</label><br>';
+        }
+        // 添加确认按钮
+        windowContent += '<button id="confirmButton">确定</button>';
+
+        // 添加取消按钮
+        windowContent += '<button id="cancelButton">取消</button>';
+
+        // 将多选框和确认按钮添加到窗口中
+        window.content(windowContent);
+        window.center().open(); // 居中显示并打开窗口       
+
+    }
+   
+    $(document).on("click", "#confirmButton", function() {
+        var selectedValues = []; // 存储选中的值
+
+        // 获取选中的多选框的值
+        $("input[type='checkbox']:checked").each(function() {
+            var value = $(this).val();
+            if (value !== 'on'){
+                selectedValues.push($(this).val());
+            }
+            
+        });
+
+        // alert(selected_id)
+        // 发送 AJAX 请求到 Django 后台
+        $.ajax({
+            url: "coderead",
+            type: "POST",
+            dataType: "json",
+            data: {
+                selectedValues: selectedValues, // 将选择的值传送到后台
+                selected_id: selected_id
+            },
+            success: function(response) {
+                // 处理后台响应
+                if(result['isok']==0)
+                {
+                    alert(result['errmsg'])
+                    $("#alertresult").html('修改失败，错误原因是：'+result['errmsg'])
+                }
+                else 
+                {
+                    $("#alertresult").html('执行成功：'+result['errmsg'])
+                    
+                }   
+
+            },
+            error: function(xhr, status, error) {
+                // 处理错误
+                console.error("Error:", error);
+            }
+        });
+
+        var kendoWindow1 = $(this).closest("[data-role=window]").data("kendoWindow");
+        kendoWindow1.destroy(); // 关闭窗口
+        location.reload(true)
+    });
+      
+    $(document).on("click", "#cancelButton", function() {
+        var kendoWindow1 = $(this).closest("[data-role=window]").data("kendoWindow");
+        kendoWindow1.destroy(); // 关闭窗口
+    })
+
+    
+
+</script>
+
+{% endblock content %}

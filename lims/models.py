@@ -33,7 +33,9 @@ class pagepermission(models.Model):
                        ("joindate", "Can maintain joindate"),('signature','Can generate signature'),
                        ('wms','manage wms'),('celltype','manage cell type'),('cellsource','manage cell source'),
                        ('stockin','can stock in cells'),('stockout','can stock out cells'),
-                       ('stockquery','can query stock'),
+                       ('stockquery','can query stock'),('codeamdin','can manage codepriv'),
+                       ('coderead','can read codepriv'),('codewrite','can modify codepriv'),
+                       ('resource','manage resource'),('resourcetype','manage resource'),
         )
 
 class appfunction(models.Model):
@@ -148,5 +150,37 @@ class stock(models.Model):
     quantity = models.IntegerField(
        verbose_name='库存数量', null=True, blank=True)
     last_operate_date = models.DateField(verbose_name='最后操作日期', default=date.today)
+
+class resourcetype(models.Model):
+    id = models.AutoField(primary_key=True)
+    type_name = models.CharField(
+        max_length=64, verbose_name='资源类型名称', null=True, blank=True)
+    
+
+class resource(models.Model):
+    id = models.AutoField(primary_key=True)
+    type_id = models.IntegerField(
+       verbose_name='资源类型', null=True, blank=True)
+    owner_id = models.IntegerField(
+       verbose_name='所有者id', null=True, blank=True)
+    code = models.CharField(
+        max_length=32,verbose_name='编码',null=True,blank=True)
+    desc =  models.CharField(
+        max_length=512,verbose_name='资源描述',null=True,blank=True)
+
+class resource_user (models.Model):
+    id = models.AutoField(primary_key=True)
+    user_id = models.IntegerField(
+       verbose_name='用户id', null=True, blank=True)
+    resource_id = models.IntegerField(
+       verbose_name='资源id', null=True, blank=True)
+    PRIV_CHOICES = (
+        (0,'无权限'),
+        (1,'读权限'),
+        (2,'写权限')
+    )
+    priv = models.IntegerField(
+       choices=PRIV_CHOICES,verbose_name='权限类型', null=True, blank=True)
+   
     
 

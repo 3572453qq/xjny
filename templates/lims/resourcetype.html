@@ -1,0 +1,107 @@
+{% extends 'lims/base_ui.html' %}
+{% block title %}资源类型维护{% endblock %}
+{% block content %}
+
+<div id="resourcetype"></div>
+
+
+<script>
+    var copiedrow = false
+    $("#resourcetype").kendoGrid({
+        dataSource: {
+            transport: {
+                read: {
+                    url:  '/lims/listing/resourcetype',
+                    dataType: 'json',
+                    type: 'GET'
+                },
+                create: {
+                    url:  '/lims/create/resourcetype',
+                    dataType: 'json',
+                    type: 'POST'
+                },
+                update: {
+                    url:  '/lims/updatelist/resourcetype',
+                    dataType: 'json',
+                    type: 'POST'
+                },
+                destroy: {
+                    url:  '/lims/delete/resourcetype',
+                    dataType: 'json',
+                    type: 'POST'
+                }
+
+
+            },
+            schema: {
+                data: "Data",
+                total: "total",
+                model: {
+                    id: "id",
+                    fields: {
+                        id: {
+                            type: "string",
+                        },
+                        type_name: {
+                            type: "string",                           
+                        }
+                        
+                    }
+                }
+            },
+            pageSize: 20,
+           
+
+        },
+        editable: 'inline',
+        sortable: true,
+        resizable: true,
+        pageable: { numeric: true,
+            previousNext: true,
+            responsive: false,
+        },
+        toolbar: ["create", "save", "cancel","search"],
+        search: {
+            fields: ["type_name","capacity",'positive','negative','formula_code']
+        },
+        columns: [
+            {
+                field: 'type_name',
+                title: '类型名称'
+            },            
+            {
+                title: '操作',
+                command: ['edit', 'destroy',
+                    {
+                        name: "复制本行",
+                        click: function (e) {
+
+                            // prevent page scroll position change
+                            e.preventDefault();
+                            // e.target is the DOM element representing the button
+                            var tr = $(e.target).closest("tr"); // get the current table row (tr)
+                            // get the data bound to the current table row
+                            newItem = this.dataItem(tr);
+                            this.addRow()
+                            copiedrow=true
+
+                        },                        
+                    }
+                ]
+            }
+        ],
+        edit: function (e) {
+            if (e.model.isNew()&&copiedrow) {
+                e.model.set("type_name", newItem.type_name)                
+                copiedrow=false
+            }
+        },
+    }); 
+ 
+      
+      
+    
+
+</script>
+
+{% endblock content %}

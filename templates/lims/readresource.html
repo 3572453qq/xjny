@@ -1,0 +1,94 @@
+{% extends 'lims/base_ui.html' %}
+{% block title %}资源维护{% endblock %}
+{% block content %}
+{{ data }}
+<div id="resource"></div>
+
+
+
+
+<script>
+    var copiedrow = false
+    var resourcetype = {{ resourcetype|safe }}
+    var users = {{ users|safe }}
+    var currentuser = {{ currentuser|safe }}
+    var selected_id = -1
+    var ls_data ={{ ls_data|safe }}
+    var total={{ total }}
+
+    // alert(ls_data)
+    console.log(ls_data)
+
+    $("#resource").kendoGrid({
+        dataSource: {   
+            data:ls_data,          
+            schema: {   
+                            
+                model: {
+                    id: "id",
+                    fields: {
+                        id: {
+                            type: "string",
+                        },
+                        type_id: {
+                            type: "string",                           
+                        },
+                        owner_id: {
+                            type: "string", 
+                            defaultValue: currentuser,                          
+                        },
+                        code: {
+                            type: "string",                           
+                        },
+                        desc: {
+                            type: "string",                           
+                        },
+                    }
+                }
+            },
+            pageSize: 20,
+           
+
+        },
+        sortable: true,
+        resizable: true,
+        pageable: { numeric: true,
+            previousNext: true,
+            responsive: false,
+        },
+        toolbar: ["search"],
+        search: {
+            fields: ["type_id","desc",'code']
+        },
+        columns: [
+            {
+                field: 'type_id',
+                values: resourcetype,
+                title: '类型名称'
+            },  
+            {
+                field: 'owner_id',
+                values: users,
+                title: '资源管理人'
+            }, 
+            {
+                field: 'code',
+                title: '资源编码'
+            },    
+            {
+                field: 'desc',
+                title: '资源说明'
+            },        
+            
+        ],
+        
+    }); 
+
+
+    
+
+    
+
+</script>
+
+{% endblock content %}
