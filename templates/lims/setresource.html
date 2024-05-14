@@ -16,29 +16,32 @@
     var resource_user_mapping = {{ resource_user_mapping|safe }}
     var otheruser = {{ otheruser|safe }}
 
-
-   
-    function generateCode() {
-        // 获取拼音首字母
-        // let pinyinArray = pinyin(resource_name, {
-        //     style: pinyin.STYLE_FIRST_LETTER
-        // });
-
-        // let initials = pinyinArray.map(item => item[0]).join('').toUpperCase();
-
-        // 生成随机的数字序列
-        let randomNumbers = Math.floor(10000000 + Math.random() * 90000000);
-
-        // 组合编码并确保长度为8位
-        let code = randomNumbers;
-
-        // 如果编码长度超过8位，截取前8位
-        if (code.length > 8) {
-            code = code.substring(0, 8);
+    function generateRandomString(length) {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * characters.length);
+                result += characters[randomIndex];
+            }
+            return result;
         }
+   
+        function generateCode() {
+            // 获取当前时间的时、分、秒组成的6位数字
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const timeString = hours + minutes + seconds;
 
-        return code;
-    }
+            // 生成5位随机字母和数字的组合
+            const randomString = generateRandomString(5);
+
+            // 组合编码
+            const code = timeString + randomString;
+
+            return code;
+        }
 
     $("#resource").kendoGrid({
         dataSource: {
