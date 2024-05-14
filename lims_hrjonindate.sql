@@ -19,3 +19,7 @@ insert into `lims_appfunction` (`id`, `name`, `priv`, `link`, `desc`, `parentid`
 insert into `lims_appfunction` (`id`, `name`, `priv`, `link`, `desc`, `parentid`) values('12','电芯入库','lims.stockin','/lims/stockin','电芯入库','9');
 insert into `lims_appfunction` (`id`, `name`, `priv`, `link`, `desc`, `parentid`) values('13','电芯出库','lims.stockout','/lims/stockout','电芯出库','9');
 insert into `lims_appfunction` (`id`, `name`, `priv`, `link`, `desc`, `parentid`) values('14','电芯库存查询','lims.stockquery','/lims/stockquery','电芯库存查询','9');
+insert into `lims_appfunction` (`id`, `name`, `priv`, `link`, `desc`, `parentid`) values('15','保密资源信息','lims.resource','/lims/index','资源信息','0');
+insert into `lims_appfunction` (`id`, `name`, `priv`, `link`, `desc`, `parentid`) values('16','管理资源类型','lims.resourcetype','/lims/setresourcetype','资源类型维护','15');
+insert into `lims_appfunction` (`id`, `name`, `priv`, `link`, `desc`, `parentid`) values('17','资源维护','lims.codewrite','/lims/setresource','资源维护','15');
+insert into `lims_appfunction` (`id`, `name`, `priv`, `link`, `desc`, `parentid`) values('18','查看资源','lims.coderead','/lims/readresource','资源查看','15');

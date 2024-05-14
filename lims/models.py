@@ -35,7 +35,7 @@ class pagepermission(models.Model):
                        ('stockin','can stock in cells'),('stockout','can stock out cells'),
                        ('stockquery','can query stock'),('codeamdin','can manage codepriv'),
                        ('coderead','can read codepriv'),('codewrite','can modify codepriv'),
-                       ('resource','manage resource'),('resourcetype','manage resource'),
+                       ('resource','manage resource'),('resourcetype','manage resource type'),
         )
 
 class appfunction(models.Model):
