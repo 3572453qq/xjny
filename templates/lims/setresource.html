@@ -170,9 +170,10 @@
         },
     }); 
 
-    console.log(resource_user_mapping)
+    
 
-    function showMultiSelect(e) {        
+    function showMultiSelect(e) {   
+        console.log(otheruser)     
         e.preventDefault();
         var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
         selected_id = Number(dataItem.id)
@@ -184,7 +185,7 @@
         console.log(this_resource_users)
 
         
-        var window = $("<div></div>").kendoWindow({
+        var window1 = $("<div></div>").kendoWindow({
                 title: "请选择可以查看此资源的用户",
                 visible: false, // 初始状态下不可见
                 modal: true, // 模态窗口，点击外部区域不能关闭窗口
@@ -200,9 +201,9 @@
 
         // 循环遍历users列表，构建多选框和label标签
         for (var i = 0; i < otheruser.length; i++) {
-            var isChecked = this_resource_users.some(item => item.user_id === users[i].value);
+            var isChecked = this_resource_users.some(item => item.user_id === otheruser[i].value);
             var checkedAttribute = isChecked ? 'checked' : '';
-            windowContent += '<label><input type="checkbox" value="' + users[i].value + '" ' + checkedAttribute + '> ' + users[i].text + '</label><br>';
+            windowContent += '<label><input type="checkbox" value="' + otheruser[i].value + '" ' + checkedAttribute + '> ' + otheruser[i].text + '</label><br>';
             // windowContent += '<label><input type="checkbox" value="' + users[i].value + '"> ' + users[i].text + '</label><br>';
         }
         // 添加确认按钮
@@ -212,8 +213,8 @@
         windowContent += '<button id="cancelButton">取消</button>';
 
         // 将多选框和确认按钮添加到窗口中
-        window.content(windowContent);
-        window.center().open(); // 居中显示并打开窗口       
+        window1.content(windowContent);
+        window1.center().open(); // 居中显示并打开窗口       
 
     }
    

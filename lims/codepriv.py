@@ -51,6 +51,7 @@ def setresource(request):
             otheruser.append({'value': user.id, 'text': user.username})    
     otheruser_json = json.dumps(otheruser) 
     context_dict['otheruser'] = otheruser_json
+    print('other user',context_dict['otheruser'] ),
     
     # 得到资源类型
     fields = ['id', 'type_name']
@@ -73,11 +74,11 @@ def resourcelisting(request):
     user_id=int(request.session.get('_auth_user_id'))
     print('this is my id:',user_id,type(user_id))
     all_users = User.objects.all()
-    print('here are all the user ids:')
-    for user in all_users:
-        print(user.id)  
+    # print('here are all the user ids:')
+    # for user in all_users:
+    #     print(user.id)  
 
-    print(user_id)
+    # print(user_id)
 
     allrecords=list(resource.objects.filter(
         owner_id=user_id).values())   
