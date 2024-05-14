@@ -70,17 +70,20 @@ def setresource(request):
 @login_required
 @permission_required('lims.resource')
 def resourcelisting(request):    
-    user_id=request.session.get('_auth_user_id')
-    print('this is my id:',user_id)
+    user_id=int(request.session.get('_auth_user_id'))
+    print('this is my id:',user_id,type(user_id))
     all_users = User.objects.all()
     print('here are all the user ids:')
     for user in all_users:
         print(user.id)  
 
+    print(user_id)
+
     allrecords=list(resource.objects.filter(
-        owner_id__in=user_id).values())   
+        owner_id=user_id).values())   
     total = len(allrecords)
     
+    print('owner have :',allrecords,total)
     dict1={"Data": allrecords, "total":total,"success": True}
     return JsonResponse(dict1)
    
