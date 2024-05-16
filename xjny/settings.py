@@ -27,12 +27,32 @@ AUTH_LDAP_BIND_DN = 'CN=Administrator,CN=Users,DC=xworld,DC=com'  # 替换为你
 AUTH_LDAP_BIND_PASSWORD = 'xinshijie@2023'  # 替换为你的绑定密码
 AUTH_LDAP_USER_SEARCH = LDAPSearch(
     "OU=inx,DC=xworld,DC=com", ldap.SCOPE_SUBTREE, "(samAccountName=%(user)s)")
+
+
+# Map LDAP attributes to Django user model fields
+AUTH_LDAP_USER_ATTR_MAP = {
+    "first_name": "givenName",
+    "last_name": "sn",
+    "email": "mail",
+}
+
 AUTH_LDAP_ALWAYS_UPDATE_USER = True
  
 AUTHENTICATION_BACKENDS = [
     'django_auth_ldap.backend.LDAPBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+LDAP_SYNC_URI = "ldap://172.28.1.254:389"
+LDAP_SYNC_BASE = "OU=inx,DC=xworld,DC=com"
+LDAP_SYNC_BASE_USER = "CN=Administrator,CN=Users,DC=xworld,DC=com"
+LDAP_SYNC_BASE_PASS = "xinshijie@2023"
+LDAP_SYNC_USER_ATTRIBUTES = {
+    "sAMAccountName": "username",
+    "givenName": "first_name",
+    "sn": "last_name",
+    "mail": "email",
+}
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -65,6 +85,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'registration',
     'corsheaders',
+    'ldap_sync',
 ]
 
 MIDDLEWARE = [
@@ -190,10 +211,10 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
-        # 'django': {
-        #     'handlers': ['file'],
-        #     'level': 'DEBUG',
-        #     'propagate': True,
-        # },
+        'django-ldap-sync': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
     }
 }

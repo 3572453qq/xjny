@@ -38,7 +38,7 @@ def setresource(request):
     all_users = User.objects.all()
     userpara = []
     for user in all_users:
-        userpara.append({'value': user.id, 'text': user.username})    
+        userpara.append({'value': user.id, 'text': user.username+user.last_name+user.first_name})    
     userpara_json = json.dumps(userpara) 
     context_dict['users'] = userpara_json
     
@@ -48,7 +48,7 @@ def setresource(request):
     otheruser = []
     for user in all_users:
         if user.id != user_id:
-            otheruser.append({'value': user.id, 'text': user.username})    
+            otheruser.append({'value': user.id, 'text': user.username+user.last_name+user.first_name})    
     otheruser_json = json.dumps(otheruser) 
     context_dict['otheruser'] = otheruser_json
     print('other user',context_dict['otheruser'] ),
@@ -98,7 +98,7 @@ def readresource(request):
     all_users = User.objects.all()
     userpara = []
     for user in all_users:
-        userpara.append({'value': user.id, 'text': user.username})    
+        userpara.append({'value': user.id, 'text': user.username+user.last_name+user.first_name})    
     userpara_json = json.dumps(userpara) 
     context_dict['users'] = userpara_json
 

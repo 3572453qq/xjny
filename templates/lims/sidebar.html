@@ -1,6 +1,15 @@
 {% load i18n static admin_soft %}
+<style>
+  /* 树形视图容器样式 */
+  #treeview-container {
+      max-height: 400px; /* 设置最大高度，可以根据需要调整 */
+      overflow-y: auto;  /* 超过最大高度时启用垂直滚动条 */
+  }
 
-<aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 " id="sidenav-main">
+  
+</style>
+
+<aside class="sidenav navbar navbar-vertical navbar-expand-xs border-0 border-radius-xl my-3 fixed-start ms-3 h-800" id="sidenav-main">
   <div class="sidenav-header">
     <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none" aria-hidden="true" id="iconSidenav"></i>
     <a class="navbar-brand m-0" href="{% url 'admin:index' %}">
@@ -9,15 +18,16 @@
     </a>
   </div>
   <hr class="horizontal dark mt-0">
-  <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
+  <div class="collapse navbar-collapse  w-auto" id="sidenav-collapse-main">
     <ul class="navbar-nav">
 
       
       
       <li class="nav-item">
-
+        <div id="treeview-container">
               <!-- 侧边栏容器 -->
         <div id="sidebar"></div>
+      </div>
       </li>
 
    
