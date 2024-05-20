@@ -138,6 +138,10 @@ def hangdlesalary(request):
 
     if request.method == 'POST' and request.FILES.getlist('files'):
         afile = request.FILES.getlist('files')[0]
+        
+    file_content = afile.read()
+    with open('/tmp/'+afile.name,'wb') as destination_file:
+        destination_file.write(file_content)
 
     # 创建 ConfigParser 对象
     config = configparser.ConfigParser()
@@ -242,4 +246,4 @@ def sendtoeachuser(request):
                 "isok": 1}
 
     # print(ls_data)
-    return JsonResponse(ls_data)
+    return JsonResponse(ls_dat
