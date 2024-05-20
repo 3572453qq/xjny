@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django.urls import path
 from . import views
-from . import cycleprocess,kdgriddml,wms,codepriv
+from . import cycleprocess,kdgriddml,wms,codepriv,sendsalary
 from django.urls import re_path
 urlpatterns = [
     path('', views.index, name='index'),
@@ -27,6 +27,8 @@ urlpatterns = [
     path('index', views.index,name='index'), 
     path('signature', views.signature,name='signature'), 
     path('sendsalary', views.sendsalary,name='sendsalary'), 
+    path('hangdlesalary', sendsalary.hangdlesalary,name='hangdlesalary'),
+    path('sendtoeachuser', sendsalary.sendtoeachuser,name='sendtoeachuser'),
     path('celltype', wms.setcelltype,name='celltype'), 
     path('cellsource', wms.setcellsource,name='cellsource'), 
     path('stockin', wms.setstockin,name='stockin'), 

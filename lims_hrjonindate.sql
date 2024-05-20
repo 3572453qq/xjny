@@ -23,3 +23,4 @@ insert into `lims_appfunction` (`id`, `name`, `priv`, `link`, `desc`, `parentid`
 insert into `lims_appfunction` (`id`, `name`, `priv`, `link`, `desc`, `parentid`) values('16','管理资源类型','lims.resourcetype','/lims/setresourcetype','资源类型维护','15');
 insert into `lims_appfunction` (`id`, `name`, `priv`, `link`, `desc`, `parentid`) values('17','资源维护','lims.codewrite','/lims/setresource','资源维护','15');
 insert into `lims_appfunction` (`id`, `name`, `priv`, `link`, `desc`, `parentid`) values('18','查看资源','lims.coderead','/lims/readresource','资源查看','15');
+insert into `lims_appfunction` (`id`, `name`, `priv`, `link`, `desc`, `parentid`) values('19','发送工资条','lims.sendsalary','/lims/sendsalary','发送工资条','6');

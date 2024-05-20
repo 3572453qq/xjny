@@ -677,6 +677,6 @@ def get_function_tree(request):
 def signature(request):
     return render(request,'lims/signature.html')
 
-
+@login_required(login_url='/admin/login/') 
 def sendsalary(request):
     return render(request,'lims/sendsalary.html') 

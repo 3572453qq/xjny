@@ -1,6 +1,8 @@
 {% extends 'lims/base_ui.html' %}
 {% block title %}发送工资条{% endblock %}
 {% block content %}
+<label for="datepickerstart">发送者企微ID：</label>
+<input type="text" id="nameInput" value={{request.user.username}}>
 <div class="row mt-4">
     <div class="col-lg-7 mb-lg-0 mb-4">
       <div class="card">
@@ -17,24 +19,17 @@
       </div>
     </div>
 </div>
-
 <form method="post" style="width:500px">
     <input name="files" id="fileUpload" type="file" />
 </form>
-<div id="gridContainer"></div>
 
-<div id="conversation"></div>
-<input type="text" id="nameInput" placeholder="Enter your name">
+
 <button id="sendButton">Send</button>
 
 <script>
-  const chatSocket = new WebSocket(
-        // 'wss://'
-        'ws://'
-        + window.location.host
-        + '/ws/salarysend/'
-    );
-
+  message_key = ''
+  name_key = ''
+  yearmonth=''
   $('#fileUpload').kendoUpload(
           {
               multiple: false,
@@ -57,12 +52,24 @@
                   allowedExtensions: ['CSV', 'XLS', 'XLSX'],
               },
               success: function (e) {
-                  console.log(e.response.data)
-                  $('#gridContainer').empty()
-                  generateGrid('gridContainer',e.response.data,e.response.columns)             
-
-              },
-              select: cleartable,
+                  console.log(e.response.return_message)
+                  alert(e.response.return_message)
+                  message_key = e.response.message_key
+                  name_key = e.response.name_key
+                  yearmonth = e.response.yearmonth
+                  var button = $("#sendButton").data("kendoButton");
+                  button.enable(true);
+                 
+              }, 
+              upload: function(e) {
+                    // Get the value from the Kendo TextBox
+                    var touserValue = $("#nameInput").val();
+                    
+                    // Add the TextBox value as a parameter to the upload request
+                    e.data = {
+                        touser: touserValue
+                    };      
+              },     
               complete: function (e) {
                 this.clearAllFiles();
                 console.log('complete event.');
@@ -72,53 +79,46 @@
               },
           }
     ); 
-    function cleartable(e){
-      var spreadsheet = $("#spreadsheet").data("kendoSpreadsheet");
-      if (spreadsheet) {
-      // 刷新电子表格以更新显示
-      spreadsheet.activeSheet().range(1,1,1000,1000).value('')
-      spreadsheet.refresh();
-      } 
-    }
-    function generateGrid(gridId,data,columns)
-    {
 
-
-      $("#" + gridId).kendoGrid({
-          dataSource: {
-              data: data,
-          },
-          height: 550,
-          sortable: true,
-          columns: columns,
-          resizable: true,
-          pageable: {pageSize: 10},
-          editable:false, 
-          filterable: true,
-      });
-      }
+    $('#nameInput').kendoTextBox({
+            
+        });
+    
+    $("#sendButton").kendoButton({
+        enable: false,
+        click: function () {
+          $.ajax({
+                // async: false,
+                type: 'POST',
+                url: '/lims/sendtoeachuser',
+                data: {
+                    'message_key': message_key,
+                    'name_key': name_key, 
+                    'yearmonth': yearmonth,                     
+                },
+                dataType: "json",
+                success: function (result) {
+                    // alert(result)
+                    if(result['isok']==0)
+                    {
+                        alert(result['errmsg'])
+                        $("#result").html('执行失败，错误原因是：'+result['errmsg'])
+                    }
+                    else
+                    { 
+                      alert(result.return_message);
+                      // window.location.href = window.location.href;
+                      
+                    }
+                }
+            });
+            ;
+            window.location.href = window.location.href;
+        }
+    })
     
    
-
-
-      var socket = new WebSocket('ws://'
-        + window.location.host
-        + '/ws/salarysend/');
-
-      socket.onopen = function(event) {
-          console.log("WebSocket connection opened.");
-      };
-
-      socket.onmessage = function(event) {
-          var message = JSON.parse(event.data);
-          $("#conversation").append("<p>" + message.text + "</p>");
-      };
-
-      $("#sendButton").click(function() {
-          var name = $("#nameInput").val();
-          var message = "hello " + name;
-          socket.send(message);
-      });
+        
 
 
 </script>

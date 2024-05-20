@@ -36,6 +36,7 @@ class pagepermission(models.Model):
                        ('stockquery','can query stock'),('codeamdin','can manage codepriv'),
                        ('coderead','can read codepriv'),('codewrite','can modify codepriv'),
                        ('resource','manage resource'),('resourcetype','manage resource type'),
+                       ('sendsalary','can send salary'),
         )
 
 class appfunction(models.Model):
