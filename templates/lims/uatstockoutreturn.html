@@ -1,0 +1,83 @@
+{% extends 'lims/base_ui.html' %}
+{% block title %}测试中心已还回电芯查询{% endblock %}
+{% block content %}
+
+<div class="demo-section">
+<div id="validation-success"></div>
+<form id="stockoutform"></div>
+
+
+</br>
+<div id="stockout"></div>
+
+
+
+<script>
+
+    all_types = {{ all_types|safe }}
+    stockouts = {{ stockouts|safe }}
+
+
+    
+    
+
+    $("#stockout").kendoGrid({
+        dataSource: {
+            data: stockouts,
+            pageSize: 20,
+        },
+        // sort: { field: "outdate", dir: "desc" },  // 指定初始排序
+        sortable: true,
+        resizable: true,
+        pageable: { numeric: true,
+            previousNext: true,
+            responsive: false,
+        },
+
+        columns: [
+            {
+                field: 'type_id',
+                values: all_types,
+                title: '电芯类型'
+            },
+            {
+                field: 'batch_no',
+                title: '电芯批号'
+            },
+            {
+                field: 'project_name',
+                title: '所属项目'
+            },
+            {
+                field: 'quantity',
+                title: '出库数量'
+            },
+            {
+                field: 'outdate',
+                title: '出库日期'
+            },
+            {
+                field: 'expect_return_date',
+                title: '预计归还日期'
+            },
+            {
+                field: 'staff',
+                title: '领用人'
+            },
+            {
+                field: 'purpose',
+                title: '用途'
+            },
+            {
+                field: 'memo',
+                title: '备注'
+            },
+           
+        ],
+       
+    }); 
+
+    
+</script>
+
+{% endblock content %}

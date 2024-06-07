@@ -1,0 +1,212 @@
+{% extends 'lims/base_ui.html' %}
+{% block title %}测试中心电芯入库{% endblock %}
+{% block content %}
+<div class="demo-section">
+<div id="validation-success"></div>
+<form id="stockinform"></div>
+</div>
+
+</br>
+<div id="stockin"></div>
+
+
+
+<script>
+
+    all_types = {{ all_types|safe }}
+    stockins = {{ stockins|safe }}
+    all_sources = {{ all_sources|safe }} 
+
+    console.log(all_types)
+    console.log(stockins)
+    console.log(all_sources)
+
+    // 形成kendoform
+    var validationSuccess = $("#validation-success");
+    function sleep(delay) {
+        var start = new Date().getTime();
+        while (new Date().getTime() < start + delay);
+    }
+
+    $("#stockinform").kendoForm({
+        messages: {
+                submit: "入库",
+                clear: "清除"
+            },
+        orientation: "horizontal",
+        formData: {
+                    type_id: 2,
+                    source_id: 1,
+                    quantity: 1,
+                    indate: new Date(),                    
+                    DateTimePicker: new Date(),
+                    staff: '余国兵'                  
+                },            
+            items: [   
+                {   editor: "DropDownList", field: "type_id", label: "电芯类型", 
+                    editorOptions:{
+                        dataSource: all_types,
+                        dataValueField: "value", 
+                        dataTextField: "text" 
+                    },
+                    validation: {required: true }
+                },
+                { editor: "MaskedTextBox", field: "source", label: "电芯来源"},   
+                { editor: "MaskedTextBox", field: "batch_no", label: "电芯批号"},     
+                { editor: "MaskedTextBox", field: "project_name", label: "所属项目"},                         
+                { editor: "NumericTextBox", field: "quantity", label: "入库数量", validation: {required: true } },
+                { editor: "DatePicker", field: "indate", label: "入库日期" ,
+                    editorOptions:{
+                        format: "yyyy-MM-dd",
+                    } 
+                },
+                { editor: "MaskedTextBox", field: "staff", label: "交付人"},
+                { editor: "MaskedTextBox", field: "memo", label: "备注" },
+                
+            ],
+            validateField: function (e) {
+                    validationSuccess.html("");
+                },
+                submit: function (e) {
+                    e.preventDefault();
+                    validationSuccess.html("<div class='k-messagebox k-messagebox-success'>Form data is valid!</div>");
+                    var form = $(e.sender.element);
+                    $.ajax({
+                        url: '/lims/uatstockin_create', 
+                        type: 'POST',
+                        data: form.serialize(),
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                alert('入库成功！');
+                            } else {
+                                alert('入库失败！');
+                            }
+                            sleep(500)  //等待0.5秒
+                            window.location.href = window.location.href;
+                        }
+                    });
+                },
+                clear: function (ev) {
+                    validationSuccess.html("");
+                }
+        });
+
+    $("#stockin").kendoGrid({
+        dataSource: {
+            data: stockins,
+            pageSize: 20,
+        },
+        // sort: { field: 'indate', dir: 'desc' },  // 指定初始排序
+        sortable: true,
+        resizable: true,
+        pageable: { numeric: true,
+            previousNext: true,
+            responsive: false,
+        },
+
+        columns: [
+            {
+                field: 'type_id',
+                values: all_types,
+                title: '电芯类型'
+            },
+            {
+                field: 'source',                
+                title: '电芯来源'
+            },
+            {
+                field: 'batch_no',                
+                title: '电芯批号'
+            },
+            {
+                field: 'project_name',                
+                title: '所属项目'
+            },
+            {
+                field: 'quantity',
+                title: '入库数量'
+            },
+            {
+                field: 'indate',
+                title: '入库日期'
+            },
+            {
+                field: 'staff',
+                title: '交付人'
+            },
+            {
+                field: 'memo',
+                title: '备注'
+            },
+            {
+                title: '操作',
+                command: [
+                    {
+                        name: "撤销入库",
+                        click: function (e) {
+
+                            // prevent page scroll position change
+                            e.preventDefault();
+                            // e.target is the DOM element representing the button
+                            var tr = $(e.target).closest("tr"); // get the current table row (tr)
+                            // get the data bound to the current table row
+                            thisItem = this.dataItem(tr);
+                            cancel_id = thisItem.id
+                            iddata = {'id':cancel_id}
+                            // 创建确认对话框
+                            var dialog = $("<div></div>").kendoDialog({
+                                width: "400px",
+                                title: "确认删除",
+                                closable: false,
+                                modal: true,
+                                content: "<p>你确定要撤销这条入库记录吗？</p>",
+                                actions: [
+                                    {
+                                        text: "确定",
+                                        primary: true,
+                                        action: function(e) {
+                                            // 在这里执行删除操作
+                                            console.log("执行删除操作");
+                                            $.ajax({
+                                                url: '/lims/uatstockin_cancel', 
+                                                type: 'POST',
+                                                data: iddata,
+                                                success: function(response) {
+                                                    if (response.status === 'success') {
+                                                        alert('撤销入库成功！');
+                                                    } else {
+                                                        alert('撤销入库失败:'+response.errmsg); 
+                                                    }
+                                                    sleep(500)  //等待0.5秒
+                                                    window.location.href = window.location.href;
+                                                }
+                                            });
+                                            dialog.data("kendoDialog").close(); // 关闭对话框
+                                        }
+                                    },
+                                    {
+                                        text: "取消",
+                                        action: function(e) {
+                                            console.log("取消删除");
+                                            dialog.data("kendoDialog").close(); // 关闭对话框
+                                        }
+                                    }
+                                ]
+                            });
+
+                            dialog.data("kendoDialog").open(); // 打开对话框
+
+                            
+
+
+                        }
+                    }]
+            }
+        ],
+       
+    }); 
+ 
+    
+</script>
+
+{% endblock content %}

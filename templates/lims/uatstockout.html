@@ -1,0 +1,354 @@
+{% extends 'lims/base_ui.html' %}
+{% block title %}测试中心电芯出库{% endblock %}
+{% block content %}
+
+<div class="demo-section">
+<div id="validation-success"></div>
+<form id="stockoutform"></div>
+
+
+</br>
+<div id="stockout"></div>
+
+
+
+<script>
+
+    all_types = {{ all_types|safe }}
+    stockouts = {{ stockouts|safe }}
+
+
+    
+    // 创建增加备注对话框
+    // var dialogmemo = $("#dialog1").kendoDialog({
+    //         width: "400px",
+    //         title: "增加备注",
+    //         closable: true,
+    //         modal: true,
+    //         actions: [
+    //             { text: 'Cancel' },
+    //             { text: 'Confirm', primary: true, action: onConfirm }
+    //         ]
+    //     })
+
+    // 形成kendoform
+    var validationSuccess = $("#validation-success");
+    function sleep(delay) {
+        var start = new Date().getTime();
+        while (new Date().getTime() < start + delay);
+    }
+
+    $("#stockoutform").kendoForm({
+            messages: {
+                submit: "出库",
+                clear: "清除"
+            },
+            orientation: "horizontal",
+            formData: {
+                    type_id: 2,
+                    quantity: 1,
+                    outdate: new Date(),
+                    expect_return_date: new Date(),                     
+                    DateTimePicker: new Date(),
+                    staff: '余国兵'                  
+                },            
+            items: [   
+                {   editor: "DropDownList", field: "type_id", label: "电芯类型", 
+                    editorOptions:{
+                        dataSource: all_types,
+                        dataValueField: "value", 
+                        dataTextField: "text" 
+                    },
+                    validation: {required: true }
+                },
+                { editor: "MaskedTextBox", field: "batch_no", label: "电芯批号"},   
+                { editor: "MaskedTextBox", field: "project_name", label: "所属项目"},             
+                { editor: "NumericTextBox", field: "quantity", label: "出库数量", validation: {required: true } },
+                { editor: "DatePicker", field: "outdate", label: "出库日期" ,
+                    editorOptions:{
+                        format: "yyyy-MM-dd",
+                    } 
+                },
+                { editor: "DatePicker", field: "expect_return_date", label: "预计归还日期" ,
+                    editorOptions:{
+                        format: "yyyy-MM-dd",
+                    } 
+                },
+                { editor: "MaskedTextBox", field: "purpose", label: "用途"},
+                { editor: "MaskedTextBox", field: "staff", label: "领用人"},
+                { editor: "MaskedTextBox", field: "memo", label: "备注" },
+                
+            ],
+            validateField: function (e) {
+                    validationSuccess.html("");
+                },
+                submit: function (e) {
+                    e.preventDefault();
+                    console.log('imthere')
+                    validationSuccess.html("<div class='k-messagebox k-messagebox-success'>Form data is valid!</div>");
+                    var form = $(e.sender.element);
+                    $.ajax({
+                        url: '/lims/uatstockout_create', 
+                        type: 'POST',
+                        data: form.serialize(),
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                alert('出库成功！');
+                            } else {
+                                alert('出库失败！'+response.errmsg);
+                            }
+                            sleep(500)  //等待0.5秒
+                            window.location.href = window.location.href;
+                        }
+                    });
+                },
+                clear: function (ev) {
+                    validationSuccess.html("");
+                }
+        });
+
+    $("#stockout").kendoGrid({
+        dataSource: {
+            data: stockouts,
+            pageSize: 20,
+        },
+        // sort: { field: "outdate", dir: "desc" },  // 指定初始排序
+        sortable: true,
+        resizable: true,
+        pageable: { numeric: true,
+            previousNext: true,
+            responsive: false,
+        },
+
+        columns: [
+            {
+                field: 'type_id',
+                values: all_types,
+                title: '电芯类型'
+            },
+            {
+                field: 'batch_no',
+                title: '电芯批号'
+            },
+            {
+                field: 'project_name',
+                title: '所属项目'
+            },
+            {
+                field: 'quantity',
+                title: '出库数量'
+            },
+            {
+                field: 'outdate',
+                title: '出库日期'
+            },
+            {
+                field: 'expect_return_date',
+                title: '预计归还日期'
+            },
+            {
+                field: 'staff',
+                title: '领用人'
+            },
+            {
+                field: 'purpose',
+                title: '用途'
+            },
+            {
+                field: 'memo',
+                title: '备注'
+            },
+            {
+                title: '操作',
+                command: [
+                    {
+                        name: "撤销出库",
+                        click: function (e) {
+
+                            // prevent page scroll position change
+                            e.preventDefault();
+                            // e.target is the DOM element representing the button
+                            var tr = $(e.target).closest("tr"); // get the current table row (tr)
+                            // get the data bound to the current table row
+                            thisItem = this.dataItem(tr);
+                            cancel_id = thisItem.id
+                            iddata = {'id':cancel_id}
+                            // 创建确认对话框
+                            var dialog = $("<div></div>").kendoDialog({
+                                width: "400px",
+                                title: "确认删除",
+                                closable: false,
+                                modal: true,
+                                content: "<p>你确定要撤销这条出库记录吗？</p>",
+                                actions: [
+                                    {
+                                        text: "确定",
+                                        primary: true,
+                                        action: function(e) {
+                                            // 在这里执行删除操作
+                                            console.log("执行删除操作");
+                                            $.ajax({
+                                                url: '/lims/uatstockout_cancel', 
+                                                type: 'POST',
+                                                data: iddata,
+                                                success: function(response) {
+                                                    if (response.status === 'success') {
+                                                        alert('撤销出库成功！');
+                                                    } else {
+                                                        alert('撤销出库失败:'+response.errmsg); 
+                                                    }
+                                                    sleep(500)  //等待0.5秒
+                                                    window.location.href = window.location.href;
+                                                }
+                                            });
+                                            dialog.data("kendoDialog").close(); // 关闭对话框
+                                        }
+                                    },
+                                    {
+                                        text: "取消",
+                                        action: function(e) {
+                                            console.log("取消删除");
+                                            dialog.data("kendoDialog").close(); // 关闭对话框
+                                        }
+                                    }
+                                ]
+                            });
+
+                            dialog.data("kendoDialog").open(); // 打开对话框                           
+
+
+                        }
+                    },
+                    {
+                        name: "增加备注",
+                        click: function (e) {
+
+                            // prevent page scroll position change
+                            e.preventDefault();
+                            // e.target is the DOM element representing the button
+                            var tr = $(e.target).closest("tr"); // get the current table row (tr)
+                            // get the data bound to the current table row
+                            thisItem = this.dataItem(tr);
+                            cancel_id = thisItem.id
+                            iddata = {'id':cancel_id}  
+                            
+                            var windowContent = `
+                                <label for="inputBox">请输入备注:</label>
+                                <textarea  id="inputBox" rows='5' cols='40' />
+                            `
+                            e.preventDefault();
+                            // e.target is the DOM element representing the button
+                            var tr = $(e.target).closest("tr"); // get the current table row (tr)
+                            // get the data bound to the current table row
+                            thisItem = this.dataItem(tr);
+                            return_id = thisItem.id
+                            
+
+                            var dialogmemo = $("<div></div>").kendoDialog({
+                                title: "请输入备注",
+                                visible: false, // 初始状态下不可见
+                                modal: true, // 模态窗口，点击外部区域不能关闭窗口
+                                width: 500,
+                                height: 300,
+                                actions: [{ text: '取消' },
+                                    {   text: '确认', 
+                                        primary: true, 
+                                        action: function(e) {
+                                            var inputVal = $("#inputBox").val();
+                                            
+                                            // 这里可以将inputVal赋值给一个字符串变量
+                                            var myString = inputVal;
+
+                                            console.log("Assigned string:", myString);
+
+                                            data = {'id':return_id,'memo':myString}
+                                            $.ajax({
+                                                url: '/lims/uatstockout_memo', 
+                                                type: 'POST',
+                                                data: data,
+                                                success: function(response) {
+                                                    if (response.status === 'success') {
+                                                        alert('增加备注成功！');
+                                                    } else {
+                                                        alert('增加备注失败:'+response.errmsg); 
+                                                    }
+                                                    sleep(500)  //等待0.5秒
+                                                    window.location.href = window.location.href;
+                                                }
+                                            });
+
+                                        } 
+                                    }
+                                ]
+                                    
+                            }).data("kendoDialog");
+                            dialogmemo.content(windowContent)
+                            dialogmemo.open(); // 打开对话框                           
+
+
+                        }
+                    },
+                    {
+                        name: "还回电芯",
+                        click: function (e) {
+                            // prevent page scroll position change
+                            e.preventDefault();
+                            // e.target is the DOM element representing the button
+                            var tr = $(e.target).closest("tr"); // get the current table row (tr)
+                            // get the data bound to the current table row
+                            thisItem = this.dataItem(tr);
+                            return_id = thisItem.id
+                            iddata = {'id':return_id}
+                            // 创建确认对话框
+                            var dialog = $("<div></div>").kendoDialog({
+                                width: "400px",
+                                title: "确认还回",
+                                closable: false,
+                                modal: true,
+                                content: "<p>你确定此条出库记录中所有电芯都已还回了吗？</p>",
+                                actions: [
+                                    {
+                                        text: "确定",
+                                        primary: true,
+                                        action: function(e) {
+                                            // 在这里执行删除操作
+                                            console.log("执行还回操作");
+                                            $.ajax({
+                                                url: '/lims/uatstockout_return', 
+                                                type: 'POST',
+                                                data: iddata,
+                                                success: function(response) {
+                                                    if (response.status === 'success') {
+                                                        alert('还回成功！');
+                                                    } else {
+                                                        alert('还回失败:'+response.errmsg); 
+                                                    }
+                                                    sleep(500)  //等待0.5秒
+                                                    window.location.href = window.location.href;
+                                                }
+                                            });
+                                            dialog.data("kendoDialog").close(); // 关闭对话框
+                                        }
+                                    },
+                                    {
+                                        text: "取消",
+                                        action: function(e) {
+                                            console.log("取消还回");
+                                            dialog.data("kendoDialog").close(); // 关闭对话框
+                                        }
+                                    }
+                                ]
+                            });
+                            dialog.data("kendoDialog").open(); // 打开对话框   
+                        }                     
+                    }
+                ]
+            }
+        ],
+       
+    }); 
+
+    
+</script>
+
+{% endblock content %}

@@ -36,7 +36,9 @@ class pagepermission(models.Model):
                        ('stockquery','can query stock'),('codeamdin','can manage codepriv'),
                        ('coderead','can read codepriv'),('codewrite','can modify codepriv'),
                        ('resource','manage resource'),('resourcetype','manage resource type'),
-                       ('sendsalary','can send salary'),
+                       ('sendsalary','can send salary'),('uatwms','manage uatwms'),('uatcelltype','manage uat cell type'),
+                       ('uatstockin','can stock in uat cells'),('uatstockout','can stock out uat cells'),
+                       ('uatstockquery','can query uat stock'),('getuatstockoutreturn','can query returned uat cells'),
         )
 
 class appfunction(models.Model):
@@ -184,4 +186,85 @@ class resource_user (models.Model):
        choices=PRIV_CHOICES,verbose_name='权限类型', null=True, blank=True)
    
     
+
+class uatcelltype(models.Model):
+    id = models.AutoField(primary_key=True)
+    type_name = models.CharField(
+        max_length=64, verbose_name='电芯类型名称', null=True, blank=True)
+    capacity = models.FloatField(
+        verbose_name='容量', null=True, blank=True)
+    positive = models.CharField(
+        max_length=64, verbose_name='正极材料', null=True, blank=True)
+    negative = models.CharField(
+        max_length=64, verbose_name='负极材料', null=True, blank=True)
+    positive_layer = models.CharField(
+        max_length=32,verbose_name='正极层数', null=True)
+    negative_layer =models.CharField(
+        max_length=32,verbose_name='负极层数', null=True)
+    electrolyte = models.CharField(
+        max_length=64, verbose_name='电解质材料', null=True, blank=True)
+    formula_code = models.CharField(
+        max_length=64, verbose_name='配方编码', null=True, blank=True)
+
+
+class uatstockin(models.Model):
+    id = models.AutoField(primary_key=True)
+    type_id = models.IntegerField(
+       verbose_name='电芯类型', null=True, blank=True)
+    source = models.CharField(
+       max_length=64,verbose_name='电芯来源', null=True, blank=True)
+    batch_no = models.CharField(
+        max_length=64,verbose_name='电芯批号',null=True,blank=True)
+    project_name = models.CharField(
+        max_length=64,verbose_name='所属项目',null=True,blank=True)
+    quantity = models.IntegerField(
+       verbose_name='入库数量', null=True, blank=True)
+    indate = models.DateField(verbose_name='入库日期', default=date.today)
+    staff = models.CharField(
+        max_length=32,verbose_name='交付人',null=True,blank=True)
+    memo = models.CharField(
+        max_length=64, verbose_name='备注', null=True, blank=True)
+    status = models.IntegerField(
+       verbose_name='是否生效', null=True, blank=True)
+    operator = models.CharField(
+        max_length=32,verbose_name='操作人',null=True,blank=True)
+    operate_date = models.DateField(verbose_name='操作日期', default=date.today)
+
+class uatstockout(models.Model):
+    id = models.AutoField(primary_key=True)
+    type_id = models.IntegerField(
+       verbose_name='电芯类型', null=True, blank=True)
+    batch_no = models.CharField(
+        max_length=64,verbose_name='电芯批号',null=True,blank=True)
+    project_name = models.CharField(
+        max_length=64,verbose_name='所属项目',null=True,blank=True)
+    quantity = models.IntegerField(
+       verbose_name='出库数量', null=True, blank=True)
+    outdate = models.DateField(verbose_name='出库日期', default=date.today)
+    staff = models.CharField(
+        max_length=32,verbose_name='领用人',null=True,blank=True)
+    expect_return_date = models.DateField(verbose_name='预计归还日期', default=date.today)
+    purpose = models.CharField(
+        max_length=64,verbose_name='用途',null=True,blank=True)
+    actual_return_date = models.DateField(verbose_name='实际归还日期', default=date.today)
+    memo = models.CharField(
+        max_length=1024, verbose_name='备注', null=True, blank=True)
+    STATUS_CHOICES = (
+        (0,'撤销出库'),
+        (1,'已出库'),
+        (2,'已还回')
+    )
+    status = models.IntegerField(
+        choices=STATUS_CHOICES,verbose_name='是否生效', null=True, blank=True)
+    operator = models.CharField(
+        max_length=32,verbose_name='操作人',null=True,blank=True)
+    operate_date = models.DateField(verbose_name='操作日期', default=date.today)
+
+class uatstock(models.Model): 
+    id = models.AutoField(primary_key=True)
+    type_id = models.IntegerField(
+       verbose_name='电芯类型', null=True, blank=True)
+    quantity = models.IntegerField(
+       verbose_name='库存数量', null=True, blank=True)
+    last_operate_date = models.DateField(verbose_name='最后操作日期', default=date.today)
 

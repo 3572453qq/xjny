@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django.urls import path
 from . import views
-from . import cycleprocess,kdgriddml,wms,codepriv,sendsalary
+from . import cycleprocess,kdgriddml,wms,codepriv,sendsalary,uatwms
 from django.urls import re_path
 urlpatterns = [
     path('', views.index, name='index'),
@@ -44,6 +44,17 @@ urlpatterns = [
     path('resourcelisting', codepriv.resourcelisting,name='resourcelisting'), 
     path('coderead', codepriv.coderead,name='coderead'),     
     path('readresource', codepriv.readresource,name='readresource'), 
+    path('uatcelltype', uatwms.setuatcelltype,name='uatcelltype'), 
+    path('uatstockin', uatwms.setuatstockin,name='uatstockin'), 
+    path('uatstockin_create', uatwms.uatstockin_create,name='uatstockin_create'), 
+    path('uatstockin_cancel', uatwms.uatstockin_cancel,name='uatstockin_cancel'), 
+    path('uatstockout', uatwms.setuatstockout,name='uatstockout'), 
+    path('uatstockout_create', uatwms.uatstockout_create,name='uatstockout_create'), 
+    path('uatstockout_cancel', uatwms.uatstockout_cancel,name='uatstockout_cancel'), 
+    path('uatstockout_return', uatwms.uatstockout_return,name='uatstockout_return'), 
+    path('uatstockout_memo', uatwms.uatstockout_memo,name='uatstockout_memo'), 
+    path('uatstockquery', uatwms.uatstockquery,name='uatstockquery'), 
+    path('getuatstockoutreturn', uatwms.getuatstockoutreturn,name='getuatstockoutreturn'), 
     re_path(r'^listing/(?P<model_name>[\w\-]+)$',
         kdgriddml.listing, name='listing'),
     re_path(r'^updatelist/(?P<model_name>[\w\-]+)$',
