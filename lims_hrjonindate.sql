@@ -24,3 +24,9 @@ insert into `lims_appfunction` (`id`, `name`, `priv`, `link`, `desc`, `parentid`
 insert into `lims_appfunction` (`id`, `name`, `priv`, `link`, `desc`, `parentid`) values('17','资源维护','lims.codewrite','/lims/setresource','资源维护','15');
 insert into `lims_appfunction` (`id`, `name`, `priv`, `link`, `desc`, `parentid`) values('18','查看资源','lims.coderead','/lims/readresource','资源查看','15');
 insert into `lims_appfunction` (`id`, `name`, `priv`, `link`, `desc`, `parentid`) values('19','发送工资条','lims.sendsalary','/lims/sendsalary','发送工资条','6');
+insert into `lims_appfunction` (`id`, `name`, `priv`, `link`, `desc`, `parentid`) values('20','测试中心库存管理','lims.uatwms','/lims/index','测试中心库存管理','0');
+insert into `lims_appfunction` (`id`, `name`, `priv`, `link`, `desc`, `parentid`) values('21','电芯类型维护','lims.uatcelltype','/lims/uatcelltype','电芯类型维护','20');
+insert into `lims_appfunction` (`id`, `name`, `priv`, `link`, `desc`, `parentid`) values('22','电芯入库','lims.uatstockin','/lims/uatstockin','电芯入库','20');
+insert into `lims_appfunction` (`id`, `name`, `priv`, `link`, `desc`, `parentid`) values('23','电芯出库','lims.uatstockout','/lims/uatstockout','电芯出库','20');
+insert into `lims_appfunction` (`id`, `name`, `priv`, `link`, `desc`, `parentid`) values('24','电芯库存查询','lims.uatstockquery','/lims/uatstockquery','电芯库存查询','20');
+insert into `lims_appfunction` (`id`, `name`, `priv`, `link`, `desc`, `parentid`) values('25','查询已还回电芯','lims.getuatstockoutreturn','/lims/getuatstockoutreturn','查询已还回电芯','20');
