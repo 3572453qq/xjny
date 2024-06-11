@@ -45,6 +45,7 @@ urlpatterns = [
     path('coderead', codepriv.coderead,name='coderead'),     
     path('readresource', codepriv.readresource,name='readresource'), 
     path('uatcelltype', uatwms.setuatcelltype,name='uatcelltype'), 
+    path('uatcellsource', uatwms.setuatcellsource,name='uatcellsource'), 
     path('uatstockin', uatwms.setuatstockin,name='uatstockin'), 
     path('uatstockin_create', uatwms.uatstockin_create,name='uatstockin_create'), 
     path('uatstockin_cancel', uatwms.uatstockin_cancel,name='uatstockin_cancel'), 

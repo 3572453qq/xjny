@@ -26,6 +26,9 @@ import mysql.connector
 def setuatcelltype(request):    
     return render(request, 'lims/uatcelltype.html')
 
+@login_required
+def setuatcellsource(request):    
+    return render(request, 'lims/uatcellsource.html')
 
 @login_required
 def setuatstockin(request):
@@ -39,7 +42,14 @@ def setuatstockin(request):
     companypara_json = json.dumps(companypara) 
     context_dict['all_types'] = companypara_json
 
-    
+    # 得到电芯来源
+    fields = ['id', 'source_name']
+    typelist = uatcellsource.objects.values(*fields)
+    companypara = []
+    for asource in typelist:
+        companypara.append({'value': asource['id'], 'text': asource['source_name']})
+    companypara_json = json.dumps(companypara) 
+    context_dict['all_sources'] = companypara_json
 
     # 得到所有status=1的电芯入库记录
     stockins = uatstockin.objects.filter(status=1).order_by('-indate').values()
@@ -61,7 +71,7 @@ def uatstockin_create(request):
         print('in_create')
         print('typeid',request.POST.get('type_id'))
         type_id = request.POST.get('type_id')
-        source = request.POST.get('source')
+        source_id = request.POST.get('source_id')
         quantity = request.POST.get('quantity')
         batch_no = request.POST.get('batch_no')
         project_name = request.POST.get('project_name')
@@ -74,7 +84,7 @@ def uatstockin_create(request):
 
         uatstockin_obj = uatstockin.objects.create(
             type_id=type_id,
-            source=source,
+            source_id=source_id,
             quantity=quantity,
             batch_no=batch_no,
             indate=indate,

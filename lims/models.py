@@ -37,7 +37,7 @@ class pagepermission(models.Model):
                        ('coderead','can read codepriv'),('codewrite','can modify codepriv'),
                        ('resource','manage resource'),('resourcetype','manage resource type'),
                        ('sendsalary','can send salary'),('uatwms','manage uatwms'),('uatcelltype','manage uat cell type'),
-                       ('uatstockin','can stock in uat cells'),('uatstockout','can stock out uat cells'),
+                       ('uatcellsource','manage uat cell source'),('uatstockin','can stock in uat cells'),('uatstockout','can stock out uat cells'),
                        ('uatstockquery','can query uat stock'),('getuatstockoutreturn','can query returned uat cells'),
         )
 
@@ -206,13 +206,16 @@ class uatcelltype(models.Model):
     formula_code = models.CharField(
         max_length=64, verbose_name='配方编码', null=True, blank=True)
 
-
+class uatcellsource(models.Model):
+    id = models.AutoField(primary_key=True)
+    source_name = models.CharField(
+        max_length=64, verbose_name='电芯来源', null=True, blank=True)
 class uatstockin(models.Model):
     id = models.AutoField(primary_key=True)
-    type_id = models.IntegerField(
+    type = models.ForeignKey(uatcelltype, on_delete=models.PROTECT,
        verbose_name='电芯类型', null=True, blank=True)
-    source = models.CharField(
-       max_length=64,verbose_name='电芯来源', null=True, blank=True)
+    source = models.ForeignKey(uatcellsource, on_delete=models.PROTECT,
+       verbose_name='电芯来源', null=True, blank=True)
     batch_no = models.CharField(
         max_length=64,verbose_name='电芯批号',null=True,blank=True)
     project_name = models.CharField(
@@ -232,7 +235,7 @@ class uatstockin(models.Model):
 
 class uatstockout(models.Model):
     id = models.AutoField(primary_key=True)
-    type_id = models.IntegerField(
+    type = models.ForeignKey(uatcelltype, on_delete=models.PROTECT,
        verbose_name='电芯类型', null=True, blank=True)
     batch_no = models.CharField(
         max_length=64,verbose_name='电芯批号',null=True,blank=True)
@@ -262,7 +265,7 @@ class uatstockout(models.Model):
 
 class uatstock(models.Model): 
     id = models.AutoField(primary_key=True)
-    type_id = models.IntegerField(
+    type = models.ForeignKey(uatcelltype, on_delete=models.PROTECT,
        verbose_name='电芯类型', null=True, blank=True)
     quantity = models.IntegerField(
        verbose_name='库存数量', null=True, blank=True)

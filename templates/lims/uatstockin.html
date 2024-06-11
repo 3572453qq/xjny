@@ -51,7 +51,14 @@
                     },
                     validation: {required: true }
                 },
-                { editor: "MaskedTextBox", field: "source", label: "电芯来源"},   
+                {   editor: "DropDownList", field: "source_id", label: "电芯来源", 
+                    editorOptions:{
+                        dataSource: all_sources,
+                        dataValueField: "value", 
+                        dataTextField: "text" 
+                    },
+                    validation: {required: true }
+                },
                 { editor: "MaskedTextBox", field: "batch_no", label: "电芯批号"},     
                 { editor: "MaskedTextBox", field: "project_name", label: "所属项目"},                         
                 { editor: "NumericTextBox", field: "quantity", label: "入库数量", validation: {required: true } },
@@ -111,7 +118,8 @@
                 title: '电芯类型'
             },
             {
-                field: 'source',                
+                field: 'source_id',
+                values: all_sources,
                 title: '电芯来源'
             },
             {
