@@ -318,7 +318,7 @@ def uatstockout_memo(request):
         print('in_stockouit_memo')
         stockout_id = request.POST.get('id')
         stockout_memo = request.POST.get('memo')
-
+        print('here is memo',stockout_memo)
         astockout = uatstockout.objects.get(pk=stockout_id) 
        
 
