@@ -95,22 +95,23 @@ for index, row in df.iterrows():
     else:
         eachUser = get_pinyin(row['staff'])  
 
+
+    print(remindmessage)
     if delta.days <= 3:
         message = f'''您好，有一批电芯需要关注，批号为：{row['batch_no']}，类型为：{row['type_name']},
             所属项目为:{row['project_name']}，领用人为：{row['staff']}， 数量为：{row['quantity']}，
             出库日期为：{row['outdate']}，预计归还日期为：{row['expect_return_date']}，
             用途为：{row['purpose']}，备注为：{row['memo']}，'''+remindmessage
 
-
    
-    send_wechat_message('wwc75be524bd50ea62', '1000026', '6-4nK0ei2e-ywGoOGYhLL_GdwzK52Pe8otR6HZWm2F0', 
-                    'huangchao', message)
+        send_wechat_message('wwc75be524bd50ea62', '1000026', '6-4nK0ei2e-ywGoOGYhLL_GdwzK52Pe8otR6HZWm2F0', 
+                        'huangchao', message)
 
-    send_wechat_message('wwc75be524bd50ea62', '1000026', '6-4nK0ei2e-ywGoOGYhLL_GdwzK52Pe8otR6HZWm2F0', 
-                    'yinzhouhong', message)
-    
-    send_wechat_message('wwc75be524bd50ea62', '1000026', '6-4nK0ei2e-ywGoOGYhLL_GdwzK52Pe8otR6HZWm2F0', 
-                    eachUser, message)
+        send_wechat_message('wwc75be524bd50ea62', '1000026', '6-4nK0ei2e-ywGoOGYhLL_GdwzK52Pe8otR6HZWm2F0', 
+                        'yinzhouhong', message)
+        
+        send_wechat_message('wwc75be524bd50ea62', '1000026', '6-4nK0ei2e-ywGoOGYhLL_GdwzK52Pe8otR6HZWm2F0', 
+                        eachUser, message)
     
     # # 打印提醒消息
     # print(message)
