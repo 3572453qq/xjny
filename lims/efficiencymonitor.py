@@ -183,6 +183,8 @@ def main():
                         'mozeqiang', message)
                 send_wechat_message('wwc75be524bd50ea62', '1000016', 'pILyhKytz4T1WvcpLpBgXEhWqLy7gAdr6TglVGoGJTI', 
                         'HuangYuanHui', message)
+                send_wechat_message('wwc75be524bd50ea62', '1000016', 'pILyhKytz4T1WvcpLpBgXEhWqLy7gAdr6TglVGoGJTI', 
+                        'ZhouAiLian', message)
         if row['库伦效率']<kl_threadhold:
             msg_count +=1 
             print('abs_time',abs_time,type(abs_time))   

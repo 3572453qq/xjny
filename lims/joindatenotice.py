@@ -26,7 +26,7 @@ def arabic_to_chinese_number(number):
     chinese_numbers = {
         '0': '零',
         '1': '一',
-        '2': '二',
+        '2': '两',
         '3': '三',
         '4': '四',
         '5': '五',
